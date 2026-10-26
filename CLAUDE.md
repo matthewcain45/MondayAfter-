@@ -69,7 +69,11 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Answers are linked to subscribers** so we can send them reports later. Subscriber emails are stored apart from answers, which use an internal ID.
 - **Readers can change their answers.** Store only the latest choice, not the history.
 - **Keep data for 2 years**, then delete it. Unsubscribing and deletion on request must work.
-- **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page.
+- **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page. There is a named version (with emails) and an anonymous version.
+- **Flight recorder text is private to the reader.** Never include it in an export, a log or the analytics. Store it encrypted with its own key, which only the "send it back to the reader" code may use. The forecast *is* visible to the owner.
+- **Analytics are measured inside the app** (screen reached, decision locked, thread pulled, file closed), stored with the reader's internal ID. No cookies, no third-party analytics and no email open tracking. Click-through comes from people opening their link.
+- **Spam protection:** the "confirm your email" step, a hidden trap field, and limits on how often someone can submit. No CAPTCHA unless agreed.
+- **Building tools** (CDK, test tools) are installed inside the project folder only. See `docs/build-plan.md` for the approved plan.
 - **Scenario content:** the owner provides the text and it is added to the project. There is no editing screen, so there is less to attack.
 - **Web address:** `themondayafter.capstoneglobaladvisory.com`, a subdomain of the owner's existing business domain.
   - The domain's DNS is managed in **Squarespace**, which also connects the business's **Google Workspace** email. The main business website is a separate S3 site.

@@ -1,6 +1,6 @@
 # Build plan: The Monday After (first version)
 
-Status: **draft, awaiting the owner's approval.** No code has been written yet.
+Status: **approved by the owner, with the amendments below.** No code has been written yet.
 
 ## What the first version includes
 
@@ -11,6 +11,33 @@ Status: **draft, awaiting the owner's approval.** No code has been written yet.
 - An opt-in follow-up email 30 days later (screen 11).
 - Unsubscribe and "delete my data", and automatic deletion after 2 years.
 - A private spreadsheet (CSV) export for the owner.
+
+## Where the data lives and what the owner sees
+
+- **Storage:** DynamoDB in the new AWS account, in London. It holds a **Subscribers** table (internal ID, email, sign-up and confirmation dates, unsubscribe status, 30-day opt-in) and a separate **Answers** table (subscriber ID, scenario, question, latest answer, time).
+- **Owner's export:** a spreadsheet (CSV) with one row per person per question, including their email, so the owner can see who answered what. There is also an **anonymous version** (IDs only, no emails) for looking at patterns.
+- **Forecast (screen 9):** included in the owner's export.
+- **Flight recorder (screen 8): private to the reader.**
+  - It is never included in any export, and the owner can't read it.
+  - It is stored encrypted, with its own key. Only the part of the system that sends it back to the reader may use that key.
+  - Every use of the key is logged.
+  - The screen wording must say plainly that the author can't see it.
+  - Honest limit: whoever controls the AWS account could, in theory, change the system to read it. The log would show that.
+
+## Analytics (measured inside the app; no third-party tools)
+
+- The app records simple events against the reader's internal ID, such as "reached this screen", "locked this decision", "pulled this thread" and "closed the file". It uses no cookies and no outside services.
+- Email delivery, bounces and complaints come from SES.
+- **Email opens are not tracked** (no tracking pixels). Click-through is measured from people opening their personal link.
+- **Owner's summary per scenario:**
+  - sent, delivered, clicked (click-through rate)
+  - how many completed each step, and where people drop out
+  - completion rate
+  - threads pulled and time per screen
+  - "take one thing back" actions set, and whether people reported doing them at 30 days
+  - unsubscribes after each issue
+  - sign-up confirmation rate
+- Analytics data follows the same 2-year deletion rule and is mentioned in the privacy notice.
 
 **Not in the first version** (suggested for later): reports emailed to subscribers, replaying a past file and comparing against your flight recorder, and a web page for editing scenarios.
 
@@ -94,17 +121,20 @@ Each phase ends with something you can check. Anything that puts something live,
 
 These are estimates; prices will be confirmed before anything is switched on. The spending alert is the safety net.
 
-## Decisions needed before building
+## Decisions made
 
-1. **Approve this plan and scope**, including what's left for later.
-2. **Spam protection on the sign-up form.** Recommended: free, built-in measures that send no data to anyone else:
+1. The plan and scope are approved.
+2. **Spam protection:** only free, built-in measures:
    - the "confirm your email" step
-   - a hidden trap field that bots fill in and people don't
+   - a hidden trap field
    - limits on how often someone can submit
 
-   A CAPTCHA can be added later if bots get through. Cloudflare's is free but sends visitor data to Cloudflare; AWS's costs about $5 or more a month.
-3. **Open questions from `screens/README.md`:**
-   - Should the 30-day follow-up stay as an opt-in tick? Recommended: yes.
-   - Should "first hour" be required in the flight recorder? Recommended: yes, as designed.
-   - The scenario wording needs your final review before launch.
-4. **Installing project tools:** the CDK and the other building tools would be installed **inside this project folder only**, not system-wide. Do you approve?
+   A CAPTCHA is considered only if bots get through.
+3. The 30-day follow-up stays as an opt-in tick. "First hour" stays required in the flight recorder. The scenario wording still needs the owner's final review before launch.
+4. Building tools are installed inside this project folder only.
+5. Analytics are measured inside the app, and email opens are not tracked.
+
+## Still to decide
+
+- **The flight recorder's encryption key** (AWS KMS) costs about $1 a month. That makes the total about £1–£2 a month.
+- **When the flight recorder is sent back to the reader**: for example in the 30-day follow-up email, in next month's email, or whenever they ask.
