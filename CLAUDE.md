@@ -94,7 +94,8 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-**Phases 1–2 are built. Phase 3 (a test copy on AWS) is written and ready.** The owner deploys it with the GitHub "Deploy test copy" button, following `docs/phase-3-deploy.md`.
+**Phases 1–2 are built. Phase 3: the test copy is deployed to AWS** (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
+- GitHub identifies this project to AWS as `matthewcain45@348284796/MondayAfter-@1434344225` (permanent IDs). The deploy role's trust setting matches that.
 
 ### Deploying (GitHub buttons, agreed with the owner)
 
