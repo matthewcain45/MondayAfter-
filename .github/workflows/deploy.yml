@@ -60,9 +60,9 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-west-2
 
-      - name: Prepare the account (first time only, safe to repeat)
-        working-directory: infra
-        run: npx cdk bootstrap
+      # The account was prepared for CDK ("bootstrapped") on the first deploy. The
+      # buttons' narrowed permissions can't redo that; if a future CDK upgrade
+      # ever asks for it, it's a one-off job to plan with the owner.
 
       # Once the "Request web address certificate" button's certificate is issued,
       # the site switches to its own address. Until then it keeps the temporary one.

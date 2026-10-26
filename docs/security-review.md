@@ -27,7 +27,29 @@
 
 ---
 
-## Your decisions
+## Your decisions: all approved and built (26 October 2026)
+
+- **A, cap on sign-ups:** done. At most 30 confirmation emails an hour across everyone. Beyond that, people see "We're getting a lot of sign-ups right now. Please try again in an hour."
+- **B, narrower GitHub access:** done in `infra/github-deploy-role.yaml`, but **you need to update the stack** (steps below). The buttons can now only:
+  - deploy through AWS CDK's own deployment roles
+  - request and look up the certificate
+  - start Send and Export
+  - read the export bucket's name
+
+  The Deploy button no longer re-prepares ("bootstraps") the account. That was a first-time job.
+- **C, backups:** done for the test copy as well, since early sign-ups land there. Every table except the throwaway rate-limit counters can be restored to any moment in the last 35 days. Cost: well under 1p a month at this size.
+- **D, "page not found" page:** done (`site/404.html`). Because CloudFront shows it for every "not found", the backend no longer uses that code for messages readers need. "No saved flight recorder" now uses a different code.
+
+### Your steps, in this order
+1. **Press Deploy** (with the old, broad permissions). This brings in the CloudFront fix and A, C and D.
+2. **Update the trust stack:**
+   - Download the new `infra/github-deploy-role.yaml` from GitHub.
+   - In the Monday After account (London), open **CloudFormation**, then **tma-github-deploy**, then **Update**.
+   - Choose **Replace existing template**, then **Upload a template file**, and pick the downloaded file.
+   - Keep both settings as they are, tick the IAM acknowledgement, and **Submit**.
+3. **Prove it still works:** press **Deploy** again, then **Request web address certificate** (it should say "issued"), then **Export spreadsheets**. If any goes red with "not authorized", send me the message and I'll add just that permission.
+
+### Original options
 
 | # | What | Recommendation | Cost |
 |---|---|---|---|

@@ -18,6 +18,7 @@ export class ApiError extends Error {
 
 const EXPIRED = "This link has expired or isn't valid. Reply to any Monday After email and we'll send you a fresh one.";
 const SLOW_DOWN = "Too many requests. Please wait a little and try again.";
+const BUSY = "We're getting a lot of sign-ups right now. Please try again in an hour.";
 
 // Analytics events the browser may send. Nothing free-text is ever accepted.
 const EVENT_NAMES = new Set(["screen", "lock", "thread", "flag", "unflag", "recorder", "forecast", "close", "share", "recorder-email"]);
@@ -72,6 +73,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       if (typeof input.website === "string" && input.website.trim() !== "") return { ok: true }; // a bot filled the hidden trap field
       if ((await store.hit("signup-ip:" + hashForLimit(input.ip), 3600)) > LIMITS.signupsPerIpPerHour) throw new ApiError(429, SLOW_DOWN);
       const email = wrapInvalid(() => validateEmail(input.email));
+      if ((await store.hit("signup-everyone", 3600)) > LIMITS.signupsPerHourEveryone) throw new ApiError(429, BUSY);
       if ((await store.hit("signup-email:" + hashForLimit(email), 86400)) > LIMITS.signupsPerEmailPerDay) return { ok: true };
 
       let subscriber = await store.findSubscriberByEmail(email);
@@ -159,7 +161,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       const { subscriber, scenario } = await resolveFile(token);
       if ((await store.hit("recorder-email:" + hashForLimit(subscriber.id), 86400)) > LIMITS.recorderEmailsPerDay) throw new ApiError(429, SLOW_DOWN);
       const rec = await store.getRecorder(subscriber.id, scenario.id);
-      if (!rec) throw new ApiError(404, "There's no saved flight recorder for this file.");
+      if (!rec) throw new ApiError(409, "There's no saved flight recorder for this file."); // not 404: CloudFront swaps 404s for its "page not found" page
       const context = { subscriberId: subscriber.id, scenarioId: scenario.id, purpose: "flight-recorder" };
       const entries = JSON.parse(await unseal(keys, rec.sealed, context)) as Record<string, string>;
       const labels = recorderFields(scenario).map((f) => ({ label: f.label.split("·")[0].trim(), text: entries[f.id] || "" }));

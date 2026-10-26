@@ -69,6 +69,13 @@ describe("data storage", () => {
     }
   });
 
+  it("backs up everything except the rate-limit counters", () => {
+    for (const r of Object.values(resources).filter((x) => x.Type === "AWS::DynamoDB::Table")) {
+      const on = (r.Properties.PointInTimeRecoverySpecification as { PointInTimeRecoveryEnabled: boolean } | undefined)?.PointInTimeRecoveryEnabled === true;
+      assert.equal(on, r.Properties.TableName !== "tma-test-limits", String(r.Properties.TableName));
+    }
+  });
+
   it("keeps every storage bucket private and HTTPS-only", () => {
     const buckets = Object.values(resources).filter((r) => r.Type === "AWS::S3::Bucket");
     assert.equal(buckets.length, 2);
@@ -128,6 +135,17 @@ describe("the website", () => {
     template.hasResourceProperties("AWS::ApiGatewayV2::Route", { RouteKey: "POST /api/file/recorder/email" });
     template.hasResourceProperties("AWS::ApiGatewayV2::Route", { RouteKey: "ANY /api/{proxy+}" });
     template.hasResourceProperties("AWS::ApiGatewayV2::Stage", { DefaultRouteSettings: { ThrottlingRateLimit: 20, ThrottlingBurstLimit: 40 } });
+  });
+
+  it("shows a friendly page for missing pages", () => {
+    template.hasResourceProperties("AWS::CloudFront::Distribution", {
+      DistributionConfig: Match.objectLike({
+        CustomErrorResponses: [
+          { ErrorCode: 403, ResponseCode: 404, ResponsePagePath: "/404.html", ErrorCachingMinTTL: 300 },
+          { ErrorCode: 404, ResponseCode: 404, ResponsePagePath: "/404.html", ErrorCachingMinTTL: 300 },
+        ],
+      }),
+    });
   });
 
   it("doesn't publish the preview pages", () => {

@@ -13,6 +13,7 @@ export const LIMITS = {
 
   signupsPerIpPerHour: 5,
   signupsPerEmailPerDay: 3,
+  signupsPerHourEveryone: 30, // stops the form being used to email thousands of strangers (approved 26 Oct 2026)
   requestsPerLinkPerHour: 600,
   recorderEmailsPerDay: 3,
 

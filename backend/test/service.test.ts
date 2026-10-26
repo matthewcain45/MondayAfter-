@@ -35,6 +35,14 @@ describe("sign-up", () => {
     await rejects(env.api.signup({ email: "test.user9@example.com", ip: "203.0.113.7" }), 429);
   });
 
+  it("caps sign-ups across everyone at 30 an hour, whatever connection they come from", async () => {
+    const env = setup();
+    for (let i = 0; i < 30; i++) await env.api.signup({ email: `test.user${i}@example.com`, ip: `203.0.113.${i}` });
+    await rejects(env.api.signup({ email: "test.user99@example.com", ip: "198.51.100.99" }), 429);
+    env.clock.advance(3600);
+    assert.deepEqual(await env.api.signup({ email: "test.user99@example.com", ip: "198.51.100.99" }), { ok: true });
+  });
+
   it("gives the same answer for an address that's already subscribed, without emailing it", async () => {
     const env = setup();
     await confirmedReader(env);

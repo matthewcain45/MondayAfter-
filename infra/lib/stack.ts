@@ -55,7 +55,10 @@ export class TmaStack extends cdk.Stack {
 
     // ---------- Storage ----------
 
-    const table = (name: string, pk: string, sk?: string) => new dynamodb.Table(this, name, {
+    // Backups: any moment from the last 35 days can be restored (pennies a month at
+    // this size). Not for the rate-limit counters, which are throwaway.
+    const table = (name: string, pk: string, sk?: string, backups = true) => new dynamodb.Table(this, name, {
+      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: backups },
       tableName: `tma-${stage}-${name.toLowerCase()}`,
       partitionKey: { name: pk, type: dynamodb.AttributeType.STRING },
       sortKey: sk ? { name: sk, type: dynamodb.AttributeType.STRING } : undefined,
@@ -70,7 +73,7 @@ export class TmaStack extends cdk.Stack {
     const answers = table("Answers", "subscriberId", "scenarioId");
     const recorders = table("Recorders", "subscriberId", "scenarioId");
     const events = table("Events", "subscriberId", "sk");
-    const limits = table("Limits", "key");
+    const limits = table("Limits", "key", undefined, false);
 
     // The flight recorder's own key (about $1 a month). Rotated automatically every year.
     const recorderKey = new kms.Key(this, "RecorderKey", {
@@ -206,6 +209,10 @@ export class TmaStack extends cdk.Stack {
     const distribution = new cloudfront.Distribution(this, "Site", {
       comment: `The Monday After (${stage})`,
       defaultRootObject: "index.html",
+      // A friendly "page not found" instead of a bare AWS error. (S3 answers 403 for
+      // missing files.) This applies to the API too, so the API avoids 403/404 for
+      // anything a reader needs to read.
+      errorResponses: [403, 404].map((httpStatus) => ({ httpStatus, responseHttpStatus: 404, responsePagePath: "/404.html", ttl: cdk.Duration.minutes(5) })),
       ...(props.webAddress
         ? {
             domainNames: [props.webAddress.domainName],

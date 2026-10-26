@@ -5,7 +5,7 @@
 # access ends after an hour at most.
 
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Lets The Monday After's GitHub buttons deploy to this account, with no stored keys.
+Description: Lets The Monday After's GitHub buttons deploy to this account, with no stored keys and only the permissions they need.
 
 Parameters:
   GitHubRepository:
@@ -50,10 +50,40 @@ Resources:
               StringEqualsIgnoreCase:
                 token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:ref:refs/heads/${AllowedBranch}
                 # Shown by the "Show GitHub's sign-in details" step of the Deploy button.
-      # Broad access inside this account only, needed to build everything the
-      # first time. It can't reach your main account. To be narrowed later.
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      # Only what the four buttons need (narrowed after the first build, as
+      # agreed in the security review). Everything else is refused.
+      Policies:
+        - PolicyName: tma-github-buttons
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Deploy: hand over to AWS CDK's own deployment roles, created once
+              # when the account was first prepared ("bootstrapped").
+              - Sid: Deploy
+                Effect: Allow
+                Action: sts:AssumeRole
+                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/cdk-hnb659fds-*
+              # Request web address certificate, and Deploy looking it up.
+              - Sid: Certificate
+                Effect: Allow
+                Action:
+                  - acm:ListCertificates
+                  - acm:DescribeCertificate
+                  - acm:RequestCertificate
+                  - acm:AddTagsToCertificate
+                Resource: "*"
+              # Send Incident File and Export spreadsheets.
+              - Sid: Buttons
+                Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource:
+                  - !Sub arn:aws:lambda:eu-west-2:${AWS::AccountId}:function:tma-*-sender
+                  - !Sub arn:aws:lambda:eu-west-2:${AWS::AccountId}:function:tma-*-export
+              # Export: find the name of the private bucket the files went to.
+              - Sid: ReadOutputs
+                Effect: Allow
+                Action: cloudformation:DescribeStacks
+                Resource: !Sub arn:aws:cloudformation:eu-west-2:${AWS::AccountId}:stack/TheMondayAfter-*/*
 
 Outputs:
   RoleArn:
