@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -37,8 +37,25 @@ jobs:
           npm run typecheck --prefix infra
           node scripts/check-scenario.mjs incident-file-01
 
+      # Shows the details GitHub presents to AWS (who, which project, which branch),
+      # so they can be matched to the trust setting. Never prints the pass itself.
+      - name: Show GitHub's sign-in details
+        continue-on-error: true
+        run: |
+          node -e '
+            const url = process.env.ACTIONS_ID_TOKEN_REQUEST_URL + "&audience=sts.amazonaws.com";
+            fetch(url, { headers: { authorization: "bearer " + process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN } })
+              .then((r) => r.json())
+              .then((j) => {
+                const c = JSON.parse(Buffer.from(j.value.split(".")[1], "base64url").toString());
+                const lines = ["sub: " + c.sub, "aud: " + c.aud, "repository: " + c.repository, "ref: " + c.ref];
+                console.log(lines.join("\n"));
+                require("fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, "### Sign-in details\n\n```\n" + lines.join("\n") + "\n```\n");
+              });
+          '
+
       - name: Sign in to AWS (short-lived)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-west-2
