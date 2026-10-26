@@ -1,0 +1,34 @@
+# The "Export spreadsheets" button. The spreadsheets never pass through GitHub:
+# they're written to a private storage bucket in AWS, which deletes them after 7 days.
+name: Export spreadsheets (test copy)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sign in to AWS (short-lived)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Build the spreadsheets
+        run: |
+          aws lambda invoke --function-name tma-test-export --cli-read-timeout 90 result.json > /dev/null
+          folder=$(node -e 'console.log(require("./result.json").folder || "")')
+          bucket=$(aws cloudformation describe-stacks --stack-name TheMondayAfter-test --query "Stacks[0].Outputs[?OutputKey=='ExportBucketName'].OutputValue" --output text)
+          if [ -z "$folder" ]; then echo "Export failed"; cat result.json; exit 1; fi
+          {
+            echo "## Spreadsheets ready"
+            echo
+            echo "Sign in to The Monday After account, open **S3**, then bucket \`$bucket\`, then folder \`$folder\`."
+            echo "Download the files you need. They delete themselves after 7 days."
+          } >> "$GITHUB_STEP_SUMMARY"

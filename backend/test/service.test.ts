@@ -147,7 +147,7 @@ describe("the flight recorder", () => {
     const { token } = await confirmedReader(env);
     await env.api.saveRecorder(token, { hour: "Test entry" });
     await assert.rejects(env.api.emailRecorder(token), /not allowed to unlock/);
-    const res = await env.apiRouter({ method: "POST", path: "/api/file/recorder/email", headers: { authorization: "Bearer " + token }, body: undefined, ip: "203.0.113.1" });
+    const res = await env.apiRouter({ method: "POST", path: "/api/file/recorder/email", headers: { "x-tma-link": token }, body: undefined, ip: "203.0.113.1" });
     assert.equal(res.status, 404);
   });
 
@@ -232,5 +232,39 @@ describe("unsubscribe and delete", () => {
     env.clock.advance(731 * DAY);
     assert.equal(await env.store.getAnswers(sub.id, "incident-file-01"), undefined);
     assert.equal(await env.store.getSubscriber(sub.id), undefined);
+  });
+});
+
+describe("sending a file", () => {
+  it("emails each confirmed reader their own working link, and nobody else", async () => {
+    const env = setup();
+    await confirmedReader(env, "test.user1@example.com");
+    await confirmedReader(env, "test.user2@example.com");
+    await env.api.signup({ email: "test.pending@example.com", ip: "203.0.113.3" }); // never confirmed
+    const before = env.mailer.outbox.length;
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 2, failed: 0 });
+    const mails = env.mailer.outbox.slice(before);
+    assert.deepEqual(mails.map((m) => m.to).sort(), ["test.user1@example.com", "test.user2@example.com"]);
+    const links = mails.map((m) => tokenFrom(m.text));
+    assert.notEqual(links[0], links[1]);
+    for (const t of links) assert.equal((await env.api.openFile(t)).scenarioId, "incident-file-01");
+    assert.match(mails[0].subject, /haven't been paid/);
+    assert.match(mails[0].text, /index\.html#t=/);
+    assert.match(mails[0].text, /manage\.html#t=/);
+    assert.equal((await env.store.listEvents()).filter((e) => e.name === "sent").length, 2);
+  });
+
+  it("keeps going if one email fails, and reports counts only", async () => {
+    const env = setup();
+    await confirmedReader(env, "test.user1@example.com");
+    await confirmedReader(env, "test.user2@example.com");
+    const send = env.mailer.send;
+    env.mailer.send = async (m) => { if (m.to === "test.user1@example.com") throw new Error("not verified"); return send(m); };
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 1 });
+  });
+
+  it("refuses an unknown file", async () => {
+    const env = setup();
+    await assert.rejects(env.api.sendFile("no-such-file"), /Unknown scenario/);
   });
 });

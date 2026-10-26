@@ -9,7 +9,7 @@
 
   async function post(path, token, body) {
     const headers = { "Content-Type": "application/json" };
-    if (token) headers.Authorization = "Bearer " + token;
+    if (token) headers["X-TMA-Link"] = token;
     const res = await fetch(apiBase + path, { method: "POST", headers, body: JSON.stringify(body || {}) });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(data.error || "Something went wrong. Please try again."), { status: res.status });

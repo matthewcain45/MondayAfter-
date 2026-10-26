@@ -3,7 +3,7 @@
 
 import { LIMITS, type Settings } from "./config.ts";
 import { hashForLimit, hashToken, newId, newToken, seal, unseal } from "./crypto.ts";
-import { confirmEmail, recorderEmail } from "./emails.ts";
+import { confirmEmail, fileEmail, recorderEmail } from "./emails.ts";
 import { scenarios, type Scenario } from "./scenarios.ts";
 import type { Clock, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
 import { InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
@@ -92,7 +92,29 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       return { ok: true };
     },
 
-    // Used by the monthly send (Phase 6) to create each reader's personal link.
+    // The "Send Incident File" button: one personal link per confirmed reader.
+    // Carries on past individual failures and reports counts only (no addresses).
+    async sendFile(scenarioId: string, options: { pauseMs?: number } = {}): Promise<{ sent: number; failed: number }> {
+      const scenario = scenarios[scenarioId];
+      if (!scenario?.email) throw new Error("Unknown scenario, or it has no email: " + scenarioId);
+      const readers = (await store.listSubscribers()).filter((s) => s.status === "confirmed");
+      let sent = 0;
+      let failed = 0;
+      for (const r of readers) {
+        try {
+          const token = await issueLink("file", r.id, LIMITS.fileLinkSeconds, scenarioId);
+          await mailer.send(fileEmail(r.email, scenario.email, urlFor("index.html", token), await manageUrl(r.id)));
+          await store.putEvent({ subscriberId: r.id, scenarioId, at: nowIso(), name: "sent", expiresAt: epoch(LIMITS.retentionSeconds) });
+          sent++;
+        } catch {
+          failed++;
+        }
+        if (options.pauseMs) await new Promise((res) => setTimeout(res, options.pauseMs));
+      }
+      return { sent, failed };
+    },
+
+    // Creates one reader's personal link for a file.
     async issueFileLink(subscriberId: string, scenarioId: string): Promise<string> {
       if (!scenarios[scenarioId]) throw new Error("Unknown scenario " + scenarioId);
       return issueLink("file", subscriberId, LIMITS.fileLinkSeconds, scenarioId);

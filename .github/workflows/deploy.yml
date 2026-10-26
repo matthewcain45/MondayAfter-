@@ -1,0 +1,61 @@
+# The "Deploy" button. Run it from the Actions tab on GitHub.
+# It runs every check first, and stops if any fail, before changing anything on AWS.
+name: Deploy test copy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # lets GitHub prove who it is to AWS (no stored keys)
+  contents: read
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install tools
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix infra
+
+      - name: Run all checks
+        run: |
+          npm test --prefix backend
+          npm run typecheck --prefix backend
+          npm test --prefix infra
+          npm run typecheck --prefix infra
+          node scripts/check-scenario.mjs incident-file-01
+
+      - name: Sign in to AWS (short-lived)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Prepare the account (first time only, safe to repeat)
+        working-directory: infra
+        run: npx cdk bootstrap
+
+      - name: Deploy
+        working-directory: infra
+        run: npx cdk deploy TheMondayAfter-test --require-approval never --outputs-file outputs.json
+
+      - name: Show the address
+        run: |
+          node -e '
+            const o = require("./infra/outputs.json")["TheMondayAfter-test"];
+            console.log("## Test copy deployed\n");
+            console.log("- Site: " + o.SiteAddress);
+            console.log("- Sign-up page: " + o.SignUpPage);
+          ' >> "$GITHUB_STEP_SUMMARY"

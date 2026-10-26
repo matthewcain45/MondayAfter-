@@ -60,7 +60,7 @@
   async function api(method, path, body) {
     const res = await fetch(apiBase + path, {
       method,
-      headers: Object.assign({ Authorization: "Bearer " + token }, body ? { "Content-Type": "application/json" } : {}),
+      headers: Object.assign({ "X-TMA-Link": token }, body ? { "Content-Type": "application/json" } : {}),
       body: body ? JSON.stringify(body) : undefined,
       keepalive: method !== "GET",
     });

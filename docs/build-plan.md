@@ -87,7 +87,9 @@ Choices made in Phase 2, for the owner to confirm:
 - Automated tests using fake people only (for example "Alex Example").
 - **You check:** I explain the test results.
 
-### Phase 3: A test copy on AWS (needs your OK to deploy)
+### Phase 3: A test copy on AWS (needs your OK to deploy). Written, ready for the owner's Deploy button
+
+Steps for the owner: `docs/phase-3-deploy.md`. Deploys run from GitHub buttons with short-lived access (no stored keys). A basic "Send Incident File" button (plain-text email) was added so the test copy can be tried end to end. Phase 6 replaces it with the designed email.
 
 - Use the setup recipe to create a **test copy** in London (`eu-west-2`) in the new account.
 - It isn't on your domain yet; it uses a temporary AWS address.

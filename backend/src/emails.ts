@@ -27,6 +27,38 @@ export function confirmEmail(to: string, brand: string, confirmUrl: string): Ema
   };
 }
 
+export interface FileEmailContent {
+  subject: string;
+  time: string;
+  paragraphs: string[];
+  question: string;
+  button: string;
+  footnote: string;
+}
+
+// Plain-text version of the monthly email (screen 1). Phase 6 adds the designed version.
+export function fileEmail(to: string, c: FileEmailContent, fileUrl: string, manageUrl: string): Email {
+  return {
+    to,
+    subject: c.subject,
+    text: [
+      c.subject,
+      "",
+      c.time,
+      "",
+      ...c.paragraphs.flatMap((p) => [p, ""]),
+      c.question,
+      "",
+      c.button.replace(/\s*→\s*$/, "") + ":",
+      fileUrl,
+      "",
+      c.footnote,
+      "This link is personal to you. Please don't forward it; use Share this file at the end instead.",
+      footer(manageUrl),
+    ].join("\n"),
+  };
+}
+
 export function recorderEmail(to: string, brand: string, fileTitle: string, savedAt: string, entries: { label: string; text: string }[], manageUrl: string): Email {
   const when = new Date(savedAt).toUTCString().replace(" GMT", " UTC");
   return {

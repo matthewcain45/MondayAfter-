@@ -17,6 +17,7 @@ export interface ScenarioScreen {
 export interface Scenario {
   id: string;
   title: string;
+  email?: import("./emails.ts").FileEmailContent;
   screens: ScenarioScreen[];
   threads: Record<string, { title: string; options: ScenarioOption[]; takeBack?: unknown }>;
 }

@@ -2,3 +2,5 @@
 .env.*
 .DS_Store
 node_modules/
+cdk.out/
+infra/outputs.json

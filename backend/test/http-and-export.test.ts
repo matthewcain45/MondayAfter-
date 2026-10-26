@@ -5,11 +5,11 @@ import { confirmedReader, designRouteState, FAKE_EMAIL, setup } from "./helpers.
 
 const req = (method: string, path: string, opts: { token?: string; body?: string } = {}) => ({
   method, path, body: opts.body, ip: "203.0.113.1",
-  headers: opts.token ? { authorization: "Bearer " + opts.token } : {},
+  headers: opts.token ? { "x-tma-link": opts.token } : {},
 });
 
 describe("web requests", () => {
-  it("routes requests and reads the link from the Authorization header", async () => {
+  it("routes requests and reads the link from the X-TMA-Link header", async () => {
     const env = setup();
     const { token } = await confirmedReader(env);
     const res = await env.apiRouter(req("GET", "/api/file", { token }));

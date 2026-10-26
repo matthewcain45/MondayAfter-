@@ -53,12 +53,9 @@ async function dev(path, res) {
   }
   if (path === "/dev/send-file") {
     // A stand-in for the monthly send (Phase 6): one personal link per confirmed reader.
-    const readers = (await store.listSubscribers()).filter((s) => s.status === "confirmed");
-    for (const r of readers) {
-      const token = await api.issueFileLink(r.id, "incident-file-01");
-      await mailer.send({ to: r.email, subject: "Incident File 01: Your temps and contractors haven't been paid.", text: `Make your first call: ${siteUrl}/index.html#t=${token}\n\n--\nUnsubscribe or delete your data: ${await api.manageUrl(r.id)}` });
-    }
-    return html("Sent", `<p>Sent Incident File 01 to ${readers.length} confirmed reader(s). <a href="/dev/">See the outbox</a>.</p>`);
+    // Same code as the "Send Incident File" button on AWS.
+    const { sent, failed } = await api.sendFile("incident-file-01");
+    return html("Sent", `<p>Sent Incident File 01 to ${sent} confirmed reader(s)${failed ? `, ${failed} failed` : ""}. <a href="/dev/">See the outbox</a>.</p>`);
   }
   if (path === "/dev/export") {
     const files = await buildExport(store);

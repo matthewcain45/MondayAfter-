@@ -1,0 +1,49 @@
+# The "Send Incident File" button. Emails every confirmed reader their own
+# personal link. Type SEND in the box to confirm: it can't be undone.
+name: Send Incident File (test copy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: Which file to send
+        required: true
+        default: incident-file-01
+      confirm:
+        description: Type SEND to confirm
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check confirmation
+        if: ${{ github.event.inputs.confirm != 'SEND' }}
+        run: |
+          echo "Not sent: type SEND in the confirm box to send." >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+      - name: Sign in to AWS (short-lived)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Send
+        env:
+          FILE_ID: ${{ github.event.inputs.file }}
+        run: |
+          case "$FILE_ID" in *[!a-z0-9-]*|"") echo "Bad file name"; exit 1;; esac
+          aws lambda invoke --function-name tma-test-sender --cli-read-timeout 320 \
+            --cli-binary-format raw-in-base64-out --payload "{\"scenarioId\":\"$FILE_ID\"}" result.json > /dev/null
+          node -e '
+            const r = require("./result.json");
+            if (typeof r.sent !== "number") { console.error("Send failed:", JSON.stringify(r)); process.exit(1); }
+            console.log("## Sent\n\n- Sent: " + r.sent + "\n- Failed: " + r.failed);
+            if (r.failed) console.log("\nWhile email is in test mode, only verified addresses can receive it. Failures are usually unverified addresses.");
+          ' >> "$GITHUB_STEP_SUMMARY"

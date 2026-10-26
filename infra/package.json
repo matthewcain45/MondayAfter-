@@ -1,0 +1,23 @@
+{
+  "name": "the-monday-after-infra",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "synth": "cdk synth --quiet",
+    "test": "node --test --test-reporter=spec \"test/**/*.test.ts\"",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.273.0",
+    "constructs": "10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "aws-cdk": "2.1145.0",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  }
+}

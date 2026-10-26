@@ -4,6 +4,20 @@
   "brand": "The Monday After",
   "replyAddress": "themondayafter@capstoneglobaladvisory.com",
 
+  "email": {
+    "subject": "Your temps and contractors haven't been paid. Nobody will say why.",
+    "time": "FRIDAY, 16:40.",
+    "paragraphs": [
+      "The agency that supplies your temps and contract workers uses an outside payroll provider. This afternoon it went down.",
+      "This week's pay hasn't landed. The agency says “a delay.” The provider says “a technical issue.”",
+      "You don't have a single list of who these people are. The contract sits with HR. IT has never seen it.",
+      "Some are on big contracts with a cushion. Some are on a few hours a week and need Friday's money. Monday is three days away."
+    ],
+    "question": "What do you do first?",
+    "button": "Make your first call →",
+    "footnote": "2 minutes to your first decision. No login. A fictional scenario built on real patterns."
+  },
+
   "screens": [
     {
       "id": "scene",

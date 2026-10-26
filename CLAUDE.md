@@ -94,7 +94,16 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-**Phase 1 (pages) and Phase 2 (saving, sign-up, analytics and export) are built and tested on this computer.** Nothing is on AWS yet. Phase 3 (a test copy on AWS) needs the owner's OK.
+**Phases 1–2 are built. Phase 3 (a test copy on AWS) is written and ready.** The owner deploys it with the GitHub "Deploy test copy" button, following `docs/phase-3-deploy.md`.
+
+### Deploying (GitHub buttons, agreed with the owner)
+
+- Deployments run only from the owner's GitHub buttons in the Actions tab:
+  - **Deploy test copy**: runs every check first, then deploys.
+  - **Send Incident File**: needs `SEND` typed to confirm.
+  - **Export spreadsheets**: files go to a private S3 bucket and delete themselves after 7 days. They never pass through GitHub.
+- GitHub gets short-lived access through the `tma-github-deploy` role (`infra/github-deploy-role.yaml`, created once by the owner in CloudFormation). It is limited to this repository and its working branch. There are no stored AWS keys. **Never run deploy commands from a Claude session**, and never add AWS keys anywhere.
+- The `AWS_DEPLOY_ROLE_ARN` repository variable holds the role's address. It isn't a secret.
 
 ### How the code is laid out
 
@@ -110,11 +119,14 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - `src/adapters/aws.ts`: the real DynamoDB, KMS and SES connections. `src/adapters/memory.ts`: stand-ins for tests and the local preview.
   - `src/lambda.ts`: the two AWS Lambda entry points. `api` can lock flight recorders but not unlock them. `recorderMailer` is the only code that can unlock one, and it only sends it to the reader's own email.
   - `src/config.ts`: link lifetimes, submission limits and retention. Changing these is an "ask first" decision.
+- `infra/`: the AWS setup as code (CDK). `lib/stack.ts` describes everything, `bin/app.ts` lists the copies (`TheMondayAfter-test` for now), and `test/stack.test.ts` checks the security rules (for example, that only the recorder mailer can decrypt).
+- `.github/workflows/`: the three buttons (`deploy.yml`, `send-file.yml`, `export.yml`).
 - `scripts/`: `preview.mjs` (local preview with the real backend code) and `check-scenario.mjs` (lists copy still needed and checks the rules are valid).
 
 ### How to run and check it locally
 
-- Tests: `cd backend && npm install && npm test`. Typecheck: `npm run typecheck`.
+- Tests: `npm ci --prefix backend && npm test --prefix backend`. AWS setup checks: `npm ci --prefix infra && npm test --prefix infra`. Typecheck either with `npm run typecheck --prefix <folder>`.
+- Build the AWS template without deploying: `cd infra && CDK_DEFAULT_ACCOUNT=111111111111 npx cdk synth --quiet`. The account number is a dummy, so nothing touches AWS.
 - Preview: `node scripts/preview.mjs`, then open `http://localhost:8080/signup.html`. Sign up with a fake address such as `test.user@example.com`. The pretend emails appear at `http://localhost:8080/dev/`, with links to confirm. `/dev/send-file` sends Incident File 01, and `/dev/export` shows the spreadsheets. The `/dev/` pages exist only in the local preview and are never deployed.
 - Phone-style preview without the backend: `http://localhost:8080/preview/email.html`.
 - Copy check: `node scripts/check-scenario.mjs incident-file-01`
@@ -122,7 +134,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 ### Rules for the code
 
 - Put scenario text and reader input into pages as text only. Never use `innerHTML` with them.
-- Personal links travel in the `#t=` part of the address, which browsers don't send to servers. They are removed from the address bar straight away, and are sent to the backend only in the `Authorization` header. Never put them in query strings or logs.
+- Personal links travel in the `#t=` part of the address, which browsers don't send to servers. They are removed from the address bar straight away, and are sent to the backend only in the `X-TMA-Link` header. Never put them in query strings or logs.
 - "Share this file" shares a general link, never the reader's personal link.
 - Flight recorder text goes only to `PUT /api/file/recorder`, and is encrypted there. Never put it in saved state, `track()`, logs or exports. The browser doesn't keep it in live mode.
 - Never log request bodies, email addresses or tokens.

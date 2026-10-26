@@ -98,6 +98,7 @@ export function summaryCsv(sc: Scenario, events: EventRecord[], answers: Answers
   const confirmed = subscribers.filter((s) => s.status !== "pending").length;
   rows.push(["Sign-ups confirmed (all files)", confirmed + " of " + all, "", ""]);
   rows.push(["Unsubscribed (all files)", subscribers.filter((s) => s.status === "unsubscribed").length, "", ""]);
+  rows.push(["Emails sent", who((e) => e.name === "sent"), "", ""]);
   rows.push(["Opened their link", opened, opened ? "100%" : "", ""]);
 
   // Time on each screen = gap until the reader's next screen (capped at 30 minutes).

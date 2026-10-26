@@ -1,5 +1,5 @@
-// Turns web requests into service calls. Personal links travel in the
-// "Authorization" header, never in the web address, so they don't end up in logs.
+// Turns web requests into service calls. Personal links travel in our own
+// "X-TMA-Link" header, never in the web address, so they don't end up in logs.
 
 import { ApiError, type Service } from "./service.ts";
 
@@ -60,8 +60,7 @@ export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTE
           return reply(400, { error: "Couldn't read the request" });
         }
       }
-      const auth = req.headers["authorization"] || "";
-      const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : undefined;
+      const token = req.headers["x-tma-link"]?.trim() || undefined;
       return reply(200, await route.run(svc, token, body, req));
     } catch (e) {
       if (e instanceof ApiError) return reply(e.status, { error: e.message });

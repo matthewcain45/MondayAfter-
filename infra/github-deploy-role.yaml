@@ -1,0 +1,57 @@
+# One-off setup, uploaded by the owner in the AWS console (CloudFormation),
+# in The Monday After account only. It lets this GitHub project's "Deploy"
+# and "Export" buttons get short-lived access to that account. No passwords
+# or keys are stored anywhere: GitHub proves who it is each time, and the
+# access ends after an hour at most.
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lets The Monday After's GitHub buttons deploy to this account, with no stored keys.
+
+Parameters:
+  GitHubRepository:
+    Type: String
+    Default: matthewcain45/MondayAfter-
+    Description: The GitHub project allowed to deploy (owner/name).
+  AllowedBranch:
+    Type: String
+    Default: claude/monday-after-claude-md-tnf5n3
+    Description: Only buttons run from this branch get access.
+
+Resources:
+  GitHubSignIn:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: tma-github-deploy
+      Description: Used only by The Monday After's GitHub Deploy and Export buttons.
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubSignIn
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringEqualsIgnoreCase:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:ref:refs/heads/${AllowedBranch}
+      # Broad access inside this account only, needed to build everything the
+      # first time. It can't reach your main account. To be narrowed later.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+Outputs:
+  RoleArn:
+    Description: Copy this into GitHub as the variable AWS_DEPLOY_ROLE_ARN
+    Value: !GetAtt DeployRole.Arn
