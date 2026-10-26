@@ -117,7 +117,8 @@ Each phase ends with something you can check. Anything that puts something live,
 | Email (SES) | Around $0.10 per 1,000 emails, so pennies |
 | HTTPS certificate | Free |
 | Domain and DNS | Nothing extra (Squarespace, already paid) |
-| **Total** | **Probably under £1 a month** |
+| Flight recorder encryption key (KMS) | About $1 a month |
+| **Total** | **About £1–£2 a month** |
 
 These are estimates; prices will be confirmed before anything is switched on. The spending alert is the safety net.
 
@@ -134,7 +135,5 @@ These are estimates; prices will be confirmed before anything is switched on. Th
 4. Building tools are installed inside this project folder only.
 5. Analytics are measured inside the app, and email opens are not tracked.
 
-## Still to decide
-
-- **The flight recorder's encryption key** (AWS KMS) costs about $1 a month. That makes the total about £1–£2 a month.
-- **When the flight recorder is sent back to the reader**: for example in the 30-day follow-up email, in next month's email, or whenever they ask.
+6. **The flight recorder's encryption key** (AWS KMS, about $1 a month) is approved. The expected total is now about £1–£2 a month.
+7. **The flight recorder is sent back on request:** the reader taps "Email me my flight recorder". Sending it in the 30-day follow-up may come later.

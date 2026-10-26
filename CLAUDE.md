@@ -70,7 +70,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Readers can change their answers.** Store only the latest choice, not the history.
 - **Keep data for 2 years**, then delete it. Unsubscribing and deletion on request must work.
 - **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page. There is a named version (with emails) and an anonymous version.
-- **Flight recorder text is private to the reader.** Never include it in an export, a log or the analytics. Store it encrypted with its own key, which only the "send it back to the reader" code may use. The forecast *is* visible to the owner.
+- **Flight recorder text is private to the reader.** Never include it in an export, a log or the analytics. Store it encrypted with its own key, which only the "send it back to the reader" code may use. The key is a customer-managed AWS KMS key (about $1 a month, approved). In the first version the reader requests it with "Email me my flight recorder". The forecast *is* visible to the owner.
 - **Analytics are measured inside the app** (screen reached, decision locked, thread pulled, file closed), stored with the reader's internal ID. No cookies, no third-party analytics and no email open tracking. Click-through comes from people opening their link.
 - **Spam protection:** the "confirm your email" step, a hidden trap field, and limits on how often someone can submit. No CAPTCHA unless agreed.
 - **Building tools** (CDK, test tools) are installed inside the project folder only. See `docs/build-plan.md` for the approved plan.
@@ -94,4 +94,24 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-Early stage: the design is agreed and the setup has been chosen, but no code has been written yet. When the build starts, record here how to run and check the project locally.
+**Phase 1 (pages) is built.** Answers are saved only in the reader's browser for now. Phase 2 adds the backend.
+
+### How the code is laid out
+
+- `site/`: the website, made of plain HTML, CSS and JavaScript with no framework and no build step.
+  - `site/index.html`, `site/js/app.js`, `site/css/app.css`: the app itself.
+  - `site/scenarios/<id>.json`: **all the words and rules for one month's scenario.** A new month means a new file. Copy the author hasn't written yet is marked `{ "todo": "..." }` and shows on screen as "Copy needed".
+  - `site/fonts/`: IBM Plex, hosted by us so readers' devices never contact Google.
+  - `site/preview/email.html`: a mock of the email, for previews only.
+- `scripts/`: helper tools that use Node's built-in modules only, so nothing needs installing.
+
+### How to run and check it locally
+
+- Preview: `node scripts/preview.mjs`, then open `http://localhost:8080/preview/email.html`. Add `?reset=1` to the app address to start fresh.
+- List the copy still needed and check that the rules are valid: `node scripts/check-scenario.mjs incident-file-01`
+
+### Rules for the app code
+
+- Put scenario text into the page as text only. Never use `innerHTML` with scenario or reader content.
+- "Share this file" shares a general link, never the reader's personal link.
+- Never send flight recorder text to `track()` or any log.
