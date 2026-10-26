@@ -94,8 +94,9 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-**Phases 1–2 are built. Phase 3: the test copy is deployed to AWS** (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
-- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. **The web address is live on the test copy** (`https://themondayafter.capstoneglobaladvisory.com`, certificate issued and CNAME added on 26 October 2026). Still to do in Phase 4: asking AWS to lift the SES sandbox (step 6 of `docs/phase-4-web-address.md`).
+**Phases 1–4 are done. Next: Phase 5 (privacy and launch checks).** Phase 3: the test copy is deployed to AWS (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
+- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. **The web address is live on the test copy** (`https://themondayafter.capstoneglobaladvisory.com`, certificate issued and CNAME added on 26 October 2026). **SES is out of the sandbox** (production access granted on 26 October 2026), so it can now email any address. **Phase 4 is complete.**
+- **Promise made to AWS in the production access request:** double opt-in, an unsubscribe/pause/delete link in every email, reliance on the SES account-level suppression list, and **reviewing bounce and complaint rates before each monthly send**. Keep these true. Phase 6 should make the bounce and complaint check easy for the owner.
 - **Web address mechanics:**
   - The padlock certificate is requested in `us-east-1` (CloudFront's rule) by the **Request web address certificate** button (`certificate.yml`), outside CDK, because a certificate can't be issued until the owner adds its DNS record.
   - Deploy looks for an issued certificate and passes it in (`-c certificateArn=…`). With one, the test copy uses the web address; without one, it keeps the CloudFront address.
