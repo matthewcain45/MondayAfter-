@@ -95,7 +95,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 ## Project status
 
 **Phases 1–2 are built. Phase 3: the test copy is deployed to AWS** (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
-- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. Still to do in Phase 4: the web address (`themondayafter.capstoneglobaladvisory.com`) and asking AWS to lift the SES sandbox. The web address setup is written; the owner's steps are in `docs/phase-4-web-address.md`.
+- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. **The web address is live on the test copy** (`https://themondayafter.capstoneglobaladvisory.com`, certificate issued and CNAME added on 26 October 2026). Still to do in Phase 4: asking AWS to lift the SES sandbox (step 6 of `docs/phase-4-web-address.md`).
 - **Web address mechanics:**
   - The padlock certificate is requested in `us-east-1` (CloudFront's rule) by the **Request web address certificate** button (`certificate.yml`), outside CDK, because a certificate can't be issued until the owner adds its DNS record.
   - Deploy looks for an issued certificate and passes it in (`-c certificateArn=…`). With one, the test copy uses the web address; without one, it keeps the CloudFront address.
