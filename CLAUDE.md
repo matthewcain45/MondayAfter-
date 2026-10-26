@@ -71,7 +71,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Keep data for 2 years**, then delete it. Unsubscribing and deletion on request must work.
 - **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page.
 - **Scenario content:** the owner provides the text and it is added to the project. There is no editing screen, so there is less to attack.
-- **Domain:** to be bought through Route 53. The name is not chosen yet.
+- **Domain:** run under the owner's existing domain, `capstoneglobaladvisory.com`. Their stated preference is the address `capstoneglobaladvisory.com/themondayafter`. A subdomain has been recommended instead and is awaiting their decision. That domain also carries the business's website and email, so any DNS change to it is "ask first" and must not affect the existing site or email.
 
 ## Notes from the screens
 
