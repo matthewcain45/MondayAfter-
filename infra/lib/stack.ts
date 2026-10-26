@@ -2,6 +2,7 @@
 // copy of the system: a test copy now, a live copy later.
 
 import cdk from "aws-cdk-lib";
+import acm from "aws-cdk-lib/aws-certificatemanager";
 import apigw from "aws-cdk-lib/aws-apigatewayv2";
 import integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import cloudfront from "aws-cdk-lib/aws-cloudfront";
@@ -25,6 +26,9 @@ export interface TmaProps extends cdk.StackProps {
   stage: "test" | "live";
   fromAddress: string; // the "From" address on emails
   replyTo: string; // where replies go
+  // The site's own web address, once its certificate (padlock) has been issued.
+  // Until then the site uses CloudFront's temporary address.
+  webAddress?: { domainName: string; certificateArn: string };
 }
 
 // Locks the site down in the browser: only our own files can load, nothing
@@ -196,6 +200,13 @@ export class TmaStack extends cdk.Stack {
     const distribution = new cloudfront.Distribution(this, "Site", {
       comment: `The Monday After (${stage})`,
       defaultRootObject: "index.html",
+      ...(props.webAddress
+        ? {
+            domainNames: [props.webAddress.domainName],
+            certificate: acm.Certificate.fromCertificateArn(this, "WebAddressCertificate", props.webAddress.certificateArn),
+            minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021, // modern, secure connections only
+          }
+        : {}),
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100, // Europe and North America edges only: cheapest
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
       defaultBehavior: {
@@ -225,7 +236,7 @@ export class TmaStack extends cdk.Stack {
       memoryLimit: 256,
     });
 
-    const siteUrl = `https://${distribution.distributionDomainName}`;
+    const siteUrl = props.webAddress ? `https://${props.webAddress.domainName}` : `https://${distribution.distributionDomainName}`;
     new ssm.StringParameter(this, "SiteUrl", { parameterName: siteUrlParam, stringValue: siteUrl });
 
     // ---------- The owner's spreadsheets ----------
@@ -243,6 +254,11 @@ export class TmaStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "SiteAddress", { value: siteUrl, description: "Open this to see the site" });
     new cdk.CfnOutput(this, "SignUpPage", { value: `${siteUrl}/signup.html` });
+    if (props.webAddress) {
+      // The record the owner adds in Squarespace so the address reaches this site.
+      const host = props.webAddress.domainName.split(".")[0];
+      new cdk.CfnOutput(this, "WebAddressRecord", { value: cdk.Fn.join(" | ", ["CNAME", host, distribution.distributionDomainName, ""]), description: "Type | Host | Value | Priority" });
+    }
     new cdk.CfnOutput(this, "ExportBucketName", { value: exportBucket.bucketName });
     new cdk.CfnOutput(this, "ExportFunctionName", { value: exportFn.functionName });
     new cdk.CfnOutput(this, "SenderFunctionName", { value: senderFn.functionName });

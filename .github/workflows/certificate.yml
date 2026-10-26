@@ -1,0 +1,55 @@
+# The "Request web address certificate" button. Asks AWS for the padlock
+# certificate for the site's own address, and shows the one DNS record to add
+# in Squarespace so AWS can confirm the domain is yours. Safe to press again:
+# it reuses an existing request and shows its current status.
+name: Request web address certificate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DOMAIN: themondayafter.capstoneglobaladvisory.com
+
+jobs:
+  certificate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sign in to AWS (short-lived)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1 # CloudFront only accepts certificates from this region
+
+      - name: Request or find the certificate
+        run: |
+          arn=$(aws acm list-certificates --certificate-statuses PENDING_VALIDATION ISSUED \
+            --query "CertificateSummaryList[?DomainName=='$DOMAIN'].CertificateArn | [0]" --output text)
+          if [ "$arn" = "None" ] || [ -z "$arn" ]; then
+            arn=$(aws acm request-certificate --domain-name "$DOMAIN" --validation-method DNS \
+              --idempotency-token tmawebaddress --tags Key=project,Value=the-monday-after \
+              --query CertificateArn --output text)
+            echo "Requested a new certificate."
+          fi
+          for i in $(seq 1 20); do
+            rec=$(aws acm describe-certificate --certificate-arn "$arn" --query "Certificate.DomainValidationOptions[0].ResourceRecord" --output json)
+            [ "$rec" != "null" ] && break
+            sleep 3
+          done
+          status=$(aws acm describe-certificate --certificate-arn "$arn" --query "Certificate.Status" --output text)
+          REC="$rec" STATUS="$status" node -e '
+            const r = JSON.parse(process.env.REC);
+            const host = r.Name.replace(/\.$/, "").replace(/\.capstoneglobaladvisory\.com$/, "");
+            const lines = [];
+            if (process.env.STATUS === "ISSUED") {
+              lines.push("## Certificate issued", "", "AWS has confirmed the domain. Press **Deploy test copy** next: it will switch the site to its own address and show the last record to add.", "", "Keep the record below in Squarespace: AWS uses it to renew the certificate every year.");
+            } else {
+              lines.push("## Certificate waiting for one DNS record (status: " + process.env.STATUS + ")", "", "Add this **new** record in Squarespace, then press this button again in about 15 minutes to check.");
+            }
+            lines.push("", "| Type | Host | Value |", "|---|---|---|", "| `" + r.Type + "` | `" + host + "` | `" + r.Value.replace(/\.$/, "") + "` |");
+            console.log(lines.join("\n"));
+          ' | tee -a "$GITHUB_STEP_SUMMARY"

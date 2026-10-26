@@ -6,6 +6,7 @@ import { TmaStack } from "../lib/stack.ts";
 
 const app = new cdk.App();
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: "eu-west-2" }; // London
+const WEB_ADDRESS = "themondayafter.capstoneglobaladvisory.com";
 
 // Sending email as @capstoneglobaladvisory.com (shared by every copy).
 new EmailStack(app, "TheMondayAfter-email", {
@@ -15,9 +16,15 @@ new EmailStack(app, "TheMondayAfter-email", {
   tags: { project: "the-monday-after" },
 });
 
+// The web address's certificate is requested by the "Request web address
+// certificate" button. Once AWS has issued it, the Deploy button passes it in
+// here (as certificateArn) and the site switches to its own address.
+const certificateArn = app.node.tryGetContext("certificateArn");
+
 new TmaStack(app, "TheMondayAfter-test", {
   stage: "test",
   env,
+  webAddress: certificateArn ? { domainName: WEB_ADDRESS, certificateArn } : undefined,
   fromAddress: "themondayafter@capstoneglobaladvisory.com",
   replyTo: "themondayafter@capstoneglobaladvisory.com",
   tags: { project: "the-monday-after", stage: "test" },

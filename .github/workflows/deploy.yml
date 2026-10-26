@@ -64,9 +64,25 @@ jobs:
         working-directory: infra
         run: npx cdk bootstrap
 
+      # Once the "Request web address certificate" button's certificate is issued,
+      # the site switches to its own address. Until then it keeps the temporary one.
+      - name: Look for the web address certificate
+        id: cert
+        run: |
+          arn=$(aws acm list-certificates --region us-east-1 --certificate-statuses ISSUED \
+            --query "CertificateSummaryList[?DomainName=='themondayafter.capstoneglobaladvisory.com'].CertificateArn | [0]" --output text)
+          if [ "$arn" = "None" ]; then arn=""; fi
+          echo "arn=$arn" >> "$GITHUB_OUTPUT"
+          if [ -n "$arn" ]; then echo "Certificate found: using the site's own address."; else echo "No issued certificate yet: keeping the temporary address."; fi
+
       - name: Deploy
         working-directory: infra
-        run: npx cdk deploy TheMondayAfter-email TheMondayAfter-test --require-approval never --outputs-file outputs.json
+        env:
+          CERT_ARN: ${{ steps.cert.outputs.arn }}
+        run: |
+          extra=""
+          if [ -n "$CERT_ARN" ]; then extra="-c certificateArn=$CERT_ARN"; fi
+          npx cdk deploy TheMondayAfter-email TheMondayAfter-test --require-approval never --outputs-file outputs.json $extra
 
       - name: Show the address
         run: |
@@ -76,6 +92,11 @@ jobs:
             console.log("## Test copy deployed\n");
             console.log("- Site: " + o.SiteAddress);
             console.log("- Sign-up page: " + o.SignUpPage);
+            if (o.WebAddressRecord) {
+              const [type, host, value] = o.WebAddressRecord.split(" | ");
+              console.log("\n## Web address: add this record in Squarespace (skip if already added)\n");
+              console.log("| Type | Host | Value |\n|---|---|---|\n| `" + type + "` | `" + host + "` | `" + value + "` |");
+            }
             const dns = Object.entries(all["TheMondayAfter-email"] || {}).filter(([k]) => k.startsWith("DnsRecord")).sort();
             if (dns.length) {
               console.log("\n## DNS records to add in Squarespace (new records only)\n");

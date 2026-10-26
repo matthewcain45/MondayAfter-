@@ -95,7 +95,11 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 ## Project status
 
 **Phases 1–2 are built. Phase 3: the test copy is deployed to AWS** (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
-- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. Still to do in Phase 4: the web address (`themondayafter.capstoneglobaladvisory.com`) and asking AWS to lift the SES sandbox.
+- **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. Still to do in Phase 4: the web address (`themondayafter.capstoneglobaladvisory.com`) and asking AWS to lift the SES sandbox. The web address setup is written; the owner's steps are in `docs/phase-4-web-address.md`.
+- **Web address mechanics:**
+  - The padlock certificate is requested in `us-east-1` (CloudFront's rule) by the **Request web address certificate** button (`certificate.yml`), outside CDK, because a certificate can't be issued until the owner adds its DNS record.
+  - Deploy looks for an issued certificate and passes it in (`-c certificateArn=…`). With one, the test copy uses the web address; without one, it keeps the CloudFront address.
+  - **The web address is currently on the test copy.** When a separate live copy is created (Phase 6), the address must move to it, before any readers arrive.
 - GitHub identifies this project to AWS as `matthewcain45@348284796/MondayAfter-@1434344225` (permanent IDs). The deploy role's trust setting matches that.
 
 ### Deploying (GitHub buttons, agreed with the owner)
@@ -122,7 +126,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - `src/lambda.ts`: the two AWS Lambda entry points. `api` can lock flight recorders but not unlock them. `recorderMailer` is the only code that can unlock one, and it only sends it to the reader's own email.
   - `src/config.ts`: link lifetimes, submission limits and retention. Changing these is an "ask first" decision.
 - `infra/`: the AWS setup as code (CDK). `lib/stack.ts` describes one copy of the system, `lib/email-stack.ts` covers sending as the domain, `bin/app.ts` lists the stacks (`TheMondayAfter-email`, `TheMondayAfter-test`), and `test/stack.test.ts` checks the security rules (for example, that only the recorder mailer can decrypt).
-- `.github/workflows/`: the three buttons (`deploy.yml`, `send-file.yml`, `export.yml`).
+- `.github/workflows/`: the buttons (`deploy.yml`, `send-file.yml`, `export.yml`, `certificate.yml`).
 - `scripts/`: `preview.mjs` (local preview with the real backend code) and `check-scenario.mjs` (lists copy still needed and checks the rules are valid).
 
 ### How to run and check it locally

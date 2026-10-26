@@ -122,3 +122,32 @@ describe("the website", () => {
     assert.ok(deploy, "site files are deployed");
   });
 });
+
+describe("the site's own web address", () => {
+  const withAddress = (certificateArn?: string) => Template.fromStack(new TmaStack(new cdk.App(), "Addr", {
+    stage: "test",
+    env: { account: "111111111111", region: "eu-west-2" },
+    fromAddress: "test.user@example.com",
+    replyTo: "test.user@example.com",
+    webAddress: certificateArn ? { domainName: "themondayafter.example.com", certificateArn } : undefined,
+  }));
+
+  it("uses the address and its certificate once the certificate exists, with modern encryption only", () => {
+    const t = withAddress("arn:aws:acm:us-east-1:111111111111:certificate/test-cert");
+    t.hasResourceProperties("AWS::CloudFront::Distribution", {
+      DistributionConfig: Match.objectLike({
+        Aliases: ["themondayafter.example.com"],
+        ViewerCertificate: Match.objectLike({ AcmCertificateArn: "arn:aws:acm:us-east-1:111111111111:certificate/test-cert", MinimumProtocolVersion: "TLSv1.2_2021" }),
+      }),
+    });
+    t.hasResourceProperties("AWS::SSM::Parameter", { Value: "https://themondayafter.example.com" });
+    assert.ok(t.toJSON().Outputs.WebAddressRecord, "shows the record to add in Squarespace");
+  });
+
+  it("keeps the temporary address until then", () => {
+    const t = withAddress();
+    const dist = Object.values(t.toJSON().Resources as Record<string, { Type: string; Properties: { DistributionConfig: Record<string, unknown> } }>).find((r) => r.Type === "AWS::CloudFront::Distribution")!;
+    assert.equal(dist.Properties.DistributionConfig.Aliases, undefined);
+    assert.equal(t.toJSON().Outputs.WebAddressRecord, undefined);
+  });
+});
