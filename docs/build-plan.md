@@ -97,6 +97,8 @@ Steps for the owner: `docs/phase-3-deploy.md`. Deploys run from GitHub buttons w
 
 ### Phase 4: Your address and email (you add the DNS records in Squarespace)
 
+The **email part was brought forward** on 26 October 2026, because Google held the test emails. Steps: `docs/phase-4-email.md`. The bounce subdomain is `tma-mail`. The web address part (and lifting the SES sandbox) follows later.
+
 - About 8 **new** DNS records:
   - 1 for the website
   - 1 for the HTTPS certificate

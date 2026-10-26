@@ -66,13 +66,20 @@ jobs:
 
       - name: Deploy
         working-directory: infra
-        run: npx cdk deploy TheMondayAfter-test --require-approval never --outputs-file outputs.json
+        run: npx cdk deploy TheMondayAfter-email TheMondayAfter-test --require-approval never --outputs-file outputs.json
 
       - name: Show the address
         run: |
           node -e '
-            const o = require("./infra/outputs.json")["TheMondayAfter-test"];
+            const all = require("./infra/outputs.json");
+            const o = all["TheMondayAfter-test"];
             console.log("## Test copy deployed\n");
             console.log("- Site: " + o.SiteAddress);
             console.log("- Sign-up page: " + o.SignUpPage);
+            const dns = Object.entries(all["TheMondayAfter-email"] || {}).filter(([k]) => k.startsWith("DnsRecord")).sort();
+            if (dns.length) {
+              console.log("\n## DNS records to add in Squarespace (new records only)\n");
+              console.log("| Type | Host | Value | Priority |\n|---|---|---|---|");
+              for (const [, v] of dns) console.log("| " + v.split(" | ").map((x) => "`" + x + "`").join(" | ").replace(/``/g, "") + " |");
+            }
           ' >> "$GITHUB_STEP_SUMMARY"

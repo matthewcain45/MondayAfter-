@@ -79,7 +79,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - The domain's DNS is managed in **Squarespace**, which also connects the business's **Google Workspace** email. The main business website is a separate S3 site.
   - **Only ever add DNS records. Never change or delete existing ones**, especially the email records (MX, SPF, DKIM, DMARC). Every DNS change is "ask first". Give the owner exact step-by-step instructions, because they add the records in Squarespace themselves.
   - Never modify the existing business website or its S3 bucket.
-- **Email:** sent through SES from `themondayafter@capstoneglobaladvisory.com`, with replies going to the owner's Google Workspace inbox. Use a separate "MAIL FROM" subdomain (for example `mail.capstoneglobaladvisory.com`) so the main domain's existing SPF record never needs editing.
+- **Email:** sent through SES from `themondayafter@capstoneglobaladvisory.com`, with replies going to the owner's Google Workspace inbox. The bounce ("MAIL FROM") subdomain is `tma-mail.capstoneglobaladvisory.com`, so the main domain's existing SPF record never needs editing. (`mail.` was avoided in case Google Workspace already uses it.) The domain identity lives in its own `TheMondayAfter-email` stack (`infra/lib/email-stack.ts`), which is shared by every copy. The Deploy summary lists the DNS records to add, and `docs/phase-4-email.md` has the owner's steps.
 - **AWS account:** a separate AWS account just for The Monday After, linked to the owner's existing account through AWS Organizations so there is one bill. Never touch the main account's resources.
 - **Sending address:** `themondayafter@capstoneglobaladvisory.com` doesn't exist yet. Recommended: create it as a free alias in Google Workspace.
 - **DMARC:** the owner found no `_dmarc` record in Squarespace. **Approved:** add `_dmarc` TXT `v=DMARC1; p=none` (monitor only, blocks nothing) during Phase 4, alongside the other new records. Tightening it later is a separate decision.
@@ -120,7 +120,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - `src/adapters/aws.ts`: the real DynamoDB, KMS and SES connections. `src/adapters/memory.ts`: stand-ins for tests and the local preview.
   - `src/lambda.ts`: the two AWS Lambda entry points. `api` can lock flight recorders but not unlock them. `recorderMailer` is the only code that can unlock one, and it only sends it to the reader's own email.
   - `src/config.ts`: link lifetimes, submission limits and retention. Changing these is an "ask first" decision.
-- `infra/`: the AWS setup as code (CDK). `lib/stack.ts` describes everything, `bin/app.ts` lists the copies (`TheMondayAfter-test` for now), and `test/stack.test.ts` checks the security rules (for example, that only the recorder mailer can decrypt).
+- `infra/`: the AWS setup as code (CDK). `lib/stack.ts` describes one copy of the system, `lib/email-stack.ts` covers sending as the domain, `bin/app.ts` lists the stacks (`TheMondayAfter-email`, `TheMondayAfter-test`), and `test/stack.test.ts` checks the security rules (for example, that only the recorder mailer can decrypt).
 - `.github/workflows/`: the three buttons (`deploy.yml`, `send-file.yml`, `export.yml`).
 - `scripts/`: `preview.mjs` (local preview with the real backend code) and `check-scenario.mjs` (lists copy still needed and checks the rules are valid).
 
