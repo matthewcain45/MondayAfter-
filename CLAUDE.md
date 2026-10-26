@@ -73,6 +73,8 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Flight recorder text is private to the reader.** Never include it in an export, a log or the analytics. Store it encrypted with its own key, which only the "send it back to the reader" code may use. The key is a customer-managed AWS KMS key (about $1 a month, approved). In the first version the reader requests it with "Email me my flight recorder". The forecast *is* visible to the owner.
 - **Analytics are measured inside the app** (screen reached, decision locked, thread pulled, file closed), stored with the reader's internal ID. No cookies, no third-party analytics and no email open tracking. Click-through comes from people opening their link.
 - **Spam protection:** the "confirm your email" step, a hidden trap field, and limits on how often someone can submit. No CAPTCHA unless agreed.
+- **The sign-up page is open to anyone before launch** (owner's decision, 26 October 2026). People who sign up early are stored in the test copy.
+- **The API only accepts requests that came through CloudFront.** CloudFront adds an `X-TMA-Origin` marker (the stack's own unique ID); `backend/src/edge.ts` checks it and reads the visitor's real address from `CloudFront-Viewer-Address`.
 - **Building tools** (CDK, test tools) are installed inside the project folder only. See `docs/build-plan.md` for the approved plan.
 - **Scenario content:** the owner provides the text and it is added to the project. There is no editing screen, so there is less to attack.
 - **Web address:** `themondayafter.capstoneglobaladvisory.com`, a subdomain of the owner's existing business domain.
@@ -94,7 +96,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-**Phases 1–4 are done. Next: Phase 5 (privacy and launch checks).** Phase 3: the test copy is deployed to AWS (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
+**Phases 1–4 are done. Phase 5 is in progress:** the security review is written up in `docs/security-review.md`, with one fix made and decisions A–D waiting for the owner. Phase 3: the test copy is deployed to AWS (first green deploy on 26 October 2026) at a temporary CloudFront address. The owner is now testing it (`docs/phase-3-deploy.md`, Parts C–D).
 - **The email part of Phase 4 is done.** The domain is verified in SES with DKIM, the `tma-mail` bounce subdomain and monitor-only DMARC, added by the owner in Squarespace on 26 October 2026, and emails now arrive. **The web address is live on the test copy** (`https://themondayafter.capstoneglobaladvisory.com`, certificate issued and CNAME added on 26 October 2026). **SES is out of the sandbox** (production access granted on 26 October 2026), so it can now email any address. **Phase 4 is complete.**
 - **Promise made to AWS in the production access request:** double opt-in, an unsubscribe/pause/delete link in every email, reliance on the SES account-level suppression list, and **reviewing bounce and complaint rates before each monthly send**. Keep these true. Phase 6 should make the bounce and complaint check easy for the owner.
 - **Web address mechanics:**

@@ -7,6 +7,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 import { dynamoStore, kmsKeys, sesMailer } from "./adapters/aws.ts";
+import { cameThroughCloudFront, visitorAddress } from "./edge.ts";
 import { buildExport } from "./export.ts";
 import { createRouter, ROUTES, type Request } from "./http.ts";
 import { createService } from "./service.ts";
@@ -49,12 +50,15 @@ async function build(canDecrypt: boolean, routes: string[]) {
   return async (event: HttpEvent) => {
     const headers: Record<string, string | undefined> = {};
     for (const [k, v] of Object.entries(event.headers || {})) headers[k.toLowerCase()] = v;
+    if (!cameThroughCloudFront(headers, process.env.ORIGIN_SECRET)) {
+      return { statusCode: 403, headers: { "content-type": "application/json" }, body: JSON.stringify({ error: "Forbidden" }) };
+    }
     const req: Request = {
       method: event.requestContext.http.method,
       path: event.requestContext.http.path,
       headers,
       body: event.body && event.isBase64Encoded ? Buffer.from(event.body, "base64").toString("utf8") : event.body,
-      ip: event.requestContext.http.sourceIp,
+      ip: visitorAddress(headers, event.requestContext.http.sourceIp),
     };
     const res = await handle(req);
     return { statusCode: res.status, headers: res.headers, body: res.body };

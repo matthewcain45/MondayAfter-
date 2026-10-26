@@ -111,6 +111,19 @@ describe("the website", () => {
     });
   });
 
+  it("only lets the API be reached through CloudFront, and passes on the visitor's address", () => {
+    const dist = Object.values(resources).find((r) => r.Type === "AWS::CloudFront::Distribution")!;
+    const apiOrigin = (dist.Properties.DistributionConfig as { Origins: { CustomOriginConfig?: unknown; OriginCustomHeaders?: { HeaderName: string; HeaderValue: unknown }[] }[] }).Origins.find((o) => o.CustomOriginConfig)!;
+    const marker = apiOrigin.OriginCustomHeaders!.find((h) => h.HeaderName === "X-TMA-Origin")!;
+    const fns = Object.values(resources).filter((r) => r.Type === "AWS::Lambda::Function" && String(r.Properties.FunctionName).startsWith("tma-test-"));
+    for (const f of fns) {
+      assert.deepEqual((f.Properties.Environment as { Variables: Record<string, unknown> }).Variables.ORIGIN_SECRET, marker.HeaderValue, String(f.Properties.FunctionName));
+    }
+    template.hasResourceProperties("AWS::CloudFront::OriginRequestPolicy", {
+      OriginRequestPolicyConfig: Match.objectLike({ HeadersConfig: { HeaderBehavior: "whitelist", Headers: Match.arrayWith(["CloudFront-Viewer-Address"]) } }),
+    });
+  });
+
   it("routes 'email me my flight recorder' to the mailer and everything else to the API", () => {
     template.hasResourceProperties("AWS::ApiGatewayV2::Route", { RouteKey: "POST /api/file/recorder/email" });
     template.hasResourceProperties("AWS::ApiGatewayV2::Route", { RouteKey: "ANY /api/{proxy+}" });

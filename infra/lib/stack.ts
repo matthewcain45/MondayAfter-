@@ -90,6 +90,10 @@ export class TmaStack extends cdk.Stack {
     // ---------- Code that runs on request ----------
 
     const siteUrlParam = `/tma/${stage}/site-url`;
+    // A secret marker CloudFront adds to every request it sends to the API, so the
+    // API can refuse requests that try to go round CloudFront. It's the unique,
+    // unguessable ID AWS gave this stack, visible only inside the account.
+    const originSecret = cdk.Fn.select(2, cdk.Fn.split("/", this.stackId));
     const common: nodejs.NodejsFunctionProps = {
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.ARM_64,
@@ -110,6 +114,7 @@ export class TmaStack extends cdk.Stack {
         FROM_ADDRESS: props.fromAddress,
         REPLY_TO: props.replyTo,
         SITE_URL_PARAM: siteUrlParam,
+        ORIGIN_SECRET: originSecret,
       },
     };
     const fn = (name: string, handler: string, extra: Partial<nodejs.NodejsFunctionProps> = {}) => new nodejs.NodejsFunction(this, name, {
@@ -192,7 +197,8 @@ export class TmaStack extends cdk.Stack {
     // Passes our personal-link header (and the rest of the request) through to the API.
     const apiRequests = new cloudfront.OriginRequestPolicy(this, "ApiRequests", {
       originRequestPolicyName: `tma-${stage}-api-requests`,
-      headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList("X-TMA-Link", "Content-Type"),
+      // CloudFront-Viewer-Address is the visitor's own internet address, added by CloudFront.
+      headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList("X-TMA-Link", "Content-Type", "CloudFront-Viewer-Address"),
       queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.none(),
       cookieBehavior: cloudfront.OriginRequestCookieBehavior.none(),
     });
@@ -217,7 +223,9 @@ export class TmaStack extends cdk.Stack {
       },
       additionalBehaviors: {
         "/api/*": {
-          origin: new origins.HttpOrigin(`${api.apiId}.execute-api.${this.region}.${this.urlSuffix}`),
+          origin: new origins.HttpOrigin(`${api.apiId}.execute-api.${this.region}.${this.urlSuffix}`, {
+            customHeaders: { "X-TMA-Origin": originSecret },
+          }),
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
