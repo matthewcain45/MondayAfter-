@@ -46,4 +46,4 @@ jobs:
             if (typeof r.sent !== "number") { console.error("Send failed:", JSON.stringify(r)); process.exit(1); }
             console.log("## Sent\n\n- Sent: " + r.sent + "\n- Failed: " + r.failed);
             if (r.failed) console.log("\nWhile email is in test mode, only verified addresses can receive it. Failures are usually unverified addresses.");
-          ' >> "$GITHUB_STEP_SUMMARY"
+          ' | tee -a "$GITHUB_STEP_SUMMARY"
