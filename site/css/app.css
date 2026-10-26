@@ -199,3 +199,8 @@ input[type="email"] { width: 100%; min-height: 52px; padding: 12px 14px; border:
   .signup-form-wrap { grid-area: form; align-self: start; position: sticky; top: 24px; }
   .signup-how { grid-area: how; }
 }
+
+/* Privacy page */
+.prose ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.prose b { color: var(--text); font-weight: 600; }
+.privacy .prose { max-width: 65ch; }
