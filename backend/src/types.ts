@@ -11,6 +11,7 @@ export interface Subscriber {
   createdAt: string;
   confirmedAt?: string;
   unsubscribedAt?: string;
+  pausedUntil?: string; // no monthly files are sent before this date
   expiresAt: number; // epoch seconds; the database deletes the record after this
 }
 

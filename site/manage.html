@@ -12,12 +12,26 @@
 </head>
 <body data-page="manage">
 <main class="screen">
-  <div class="top"><span>The Monday After</span><span>Your data</span></div>
+  <div class="top"><span>The Monday After</span><span>Your emails</span></div>
   <div class="body">
-    <section id="manage-choose" data-step>
+    <section id="manage-wait" data-step>
+      <p class="intro">Checking your link…</p>
+    </section>
+    <section id="manage-choose" data-step hidden>
       <div class="body" style="padding:0;gap:12px">
         <h1>Your emails and data.</h1>
-        <div class="card">
+        <p id="manage-state" class="intro" style="font-size:.94rem">You get one incident file a month.</p>
+        <div class="card" id="pause-card">
+          <h2 class="kicker teal">Take a break</h2>
+          <p class="note-line">No files for 3 months, then they start again by themselves. Your answers stay as they are.</p>
+          <button id="pause" class="btn secondary small-btn" type="button">Pause for 3 months</button>
+        </div>
+        <div class="card" id="resume-card" hidden>
+          <h2 class="kicker teal">On a break</h2>
+          <p id="paused-until" class="note-line">Files start again later.</p>
+          <button id="resume" class="btn secondary small-btn" type="button">Resume now</button>
+        </div>
+        <div class="card" id="unsubscribe-card">
           <h2 class="kicker amber">Stop the emails</h2>
           <p class="note-line">No more monthly files. Your past answers are kept for up to 2 years, then deleted.</p>
           <button id="unsubscribe" class="btn secondary small-btn" type="button">Unsubscribe</button>
@@ -38,17 +52,13 @@
         <button id="delete-cancel" class="btn secondary" type="button">Cancel</button>
       </div>
     </section>
-    <section id="manage-unsubscribed" data-step hidden>
-      <h1>You're unsubscribed.</h1>
-      <p class="intro" style="font-size:.94rem">You won't get any more monthly files. You can still delete your data from the link in any past email.</p>
-    </section>
     <section id="manage-deleted" data-step hidden>
       <h1>Deleted.</h1>
       <p class="intro" style="font-size:.94rem">We've deleted your email address, answers and flight recorders. Thank you for taking part.</p>
     </section>
     <section id="manage-missing" data-step hidden>
       <h1>Use the link in your email.</h1>
-      <p class="intro" style="font-size:.94rem">To unsubscribe or delete your data, open the link at the bottom of any Monday After email.</p>
+      <p id="manage-missing-text" class="intro" style="font-size:.94rem">To pause, unsubscribe or delete your data, open the link at the bottom of any Monday After email.</p>
     </section>
   </div>
 </main>

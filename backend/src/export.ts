@@ -78,8 +78,8 @@ export function answersCsv(answers: AnswersRecord[], subscribers: Subscriber[], 
 }
 
 export function subscribersCsv(subscribers: Subscriber[]): string {
-  return toCsv([["email", "subscriber_id", "status", "signed_up", "confirmed", "unsubscribed"],
-    ...subscribers.map((s) => [s.email, s.id, s.status, s.createdAt, s.confirmedAt ?? "", s.unsubscribedAt ?? ""])]);
+  return toCsv([["email", "subscriber_id", "status", "signed_up", "confirmed", "unsubscribed", "paused_until"],
+    ...subscribers.map((s) => [s.email, s.id, s.status, s.createdAt, s.confirmedAt ?? "", s.unsubscribedAt ?? "", s.pausedUntil ?? ""])]);
 }
 
 const SCREEN_NAMES: Record<string, string> = { story: "The twist", ledger: "The ledger", closing: "Closing screen" };
@@ -98,6 +98,7 @@ export function summaryCsv(sc: Scenario, events: EventRecord[], answers: Answers
   const confirmed = subscribers.filter((s) => s.status !== "pending").length;
   rows.push(["Sign-ups confirmed (all files)", confirmed + " of " + all, "", ""]);
   rows.push(["Unsubscribed (all files)", subscribers.filter((s) => s.status === "unsubscribed").length, "", ""]);
+  rows.push(["Paused at the moment (all files)", subscribers.filter((s) => s.status === "confirmed" && s.pausedUntil && Date.parse(s.pausedUntil) > Date.now()).length, "", ""]);
   rows.push(["Emails sent", who((e) => e.name === "sent"), "", ""]);
   rows.push(["Opened their link", opened, opened ? "100%" : "", ""]);
 

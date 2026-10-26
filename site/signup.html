@@ -6,35 +6,80 @@
 <meta name="theme-color" content="#0E1621">
 <meta name="referrer" content="no-referrer">
 <meta name="tma-api" content="/api">
-<title>Sign up · The Monday After</title>
+<meta name="description" content="A free, fictional incident file for aspiring CIOs, once a month. Make the calls, see what you assumed, and see what it cost.">
+<title>The Monday After · An incident a month for aspiring CIOs</title>
+<link rel="preload" href="fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body data-page="signup">
-<main class="screen">
-  <div class="top"><span>The Monday After</span><span>Sign up</span></div>
-  <div class="body">
-    <section id="signup-start" data-step>
-      <div class="body" style="padding:0;gap:14px">
-        <h1 class="big">One incident a month. Your call.</h1>
-        <p class="intro" style="font-size:.94rem">A free, fictional incident file for aspiring CIOs, in your inbox once a month. Make the calls, see what you assumed, and see what it cost.</p>
-        <form id="signup-form" class="body" style="padding:0;gap:10px" novalidate>
-          <label for="email" class="kicker amber">Your email</label>
+<main class="signup">
+  <div class="top"><span>The Monday After</span><span>Free · Monthly</span></div>
+
+  <div class="signup-grid">
+    <section class="signup-pitch" aria-labelledby="pitch-title">
+      <p class="kicker amber">For aspiring CIOs</p>
+      <h1 id="pitch-title" class="big">One incident a month. Your call.</h1>
+      <p class="lede">A short, fictional crisis lands in your inbox once a month. Make the calls, see what you assumed, and see what it cost your organisation.</p>
+
+      <figure class="file-teaser" aria-label="An example: Incident File 01">
+        <p class="time">Incident File 01 · Friday, 16:40</p>
+        <p class="file-teaser-title">Your temps and contractors haven't been paid. Nobody will say why.</p>
+        <div class="chips">
+          <span class="chip">2 minutes to your first decision</span>
+          <span class="chip">No login</span>
+        </div>
+        <figcaption class="small">A fictional scenario built on real patterns.</figcaption>
+      </figure>
+    </section>
+
+    <section class="signup-form-wrap" aria-labelledby="form-title">
+      <div id="signup-start" data-step class="card signup-form-card">
+        <h2 id="form-title" class="kicker teal">Get the next file</h2>
+        <form id="signup-form" novalidate>
+          <label for="email" class="field-label">Your email</label>
           <input type="email" id="email" name="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
           <div class="trap" aria-hidden="true">
             <label for="website">Leave this empty</label>
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
           </div>
           <p id="signup-error" class="error" role="alert"></p>
-          <button class="btn" type="submit">Sign me up</button>
+          <button class="btn" type="submit">Send me the next file →</button>
         </form>
-        <p class="small">We store your email address and your answers, nothing else. No tracking, no adverts, and every email lets you unsubscribe or delete your data. <a href="privacy.html">How we use your data</a>.</p>
+        <p class="small">One file a month, plus one email now to confirm it's you. Every email lets you pause, unsubscribe or delete your data. No tracking, no adverts. <a href="privacy.html">How we use your data</a>.</p>
+      </div>
+      <div id="signup-done" data-step hidden class="card signup-form-card">
+        <h2 class="kicker teal">Almost there</h2>
+        <h1>Check your inbox.</h1>
+        <p class="note-line">We've sent you a link to confirm your email. It works for 24 hours. If it doesn't arrive, check your spam folder.</p>
       </div>
     </section>
-    <section id="signup-done" data-step hidden>
-      <h1 class="big">Check your inbox.</h1>
-      <p class="intro" style="font-size:.94rem">We've sent you a link to confirm your email. It works for 24 hours. If it doesn't arrive, check your spam folder.</p>
+
+    <section class="signup-how" aria-labelledby="how-title">
+      <h2 id="how-title" class="kicker">How each file works</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-n" aria-hidden="true">1</span>
+          <div><b>Make the call.</b> <span>Pick your first move, then adjust when the story turns. No right answers.</span></div>
+        </li>
+        <li>
+          <span class="step-n" aria-hidden="true">2</span>
+          <div><b>See what you assumed.</b> <span>Every move rests on something you haven't checked.</span></div>
+        </li>
+        <li>
+          <span class="step-n" aria-hidden="true">3</span>
+          <div><b>Read the ledger.</b> <span>What your choices built up and drew down, three months on.</span>
+            <div class="mini-ledger" aria-label="Example ledger rows">
+              <div class="mini-row"><span class="dim">Dependency</span><span class="pill drain">Drain</span></div>
+              <div class="mini-row"><span class="dim">Visibility</span><span class="pill deposit">Deposit</span></div>
+              <div class="mini-row"><span class="dim">Trust</span><span class="pill deposit">Deposit</span></div>
+            </div>
+          </div>
+        </li>
+      </ol>
     </section>
   </div>
+
+  <footer class="signup-foot small">From Capstone Global Advisory. Your data is stored in London and deleted 2 years after you last take part. <a href="privacy.html">Privacy</a></footer>
 </main>
 <script src="js/pages.js" defer></script>
 </body>

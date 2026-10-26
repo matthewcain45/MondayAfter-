@@ -111,7 +111,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 - `site/`: the website, made of plain HTML, CSS and JavaScript with no framework and no build step.
   - `index.html` with `js/app.js`: the scenario app. It runs in **live** mode when opened from a personal link (`#t=TOKEN`) and saves to the backend. It runs in **preview** mode with `?preview`, or where there's no `tma-api` meta tag, and keeps answers in the browser only.
-  - `signup.html`, `confirm.html`, `manage.html` with `js/pages.js`: sign-up, confirming, and unsubscribe or delete.
+  - `signup.html`, `confirm.html`, `manage.html` with `js/pages.js`: sign-up (the designed "front door" page), confirming, and the manage page (take a 3-month break, resume, unsubscribe or delete). Paused readers are skipped by Send Incident File until their pause ends.
   - `privacy.html`: a draft, to be finished in Phase 5.
   - `scenarios/<id>.json`: **all the words and rules for one month's scenario.** A new month means a new file, plus one import line in `backend/src/scenarios.ts`. Copy the author hasn't written yet is marked `{ "todo": "..." }` and shows on screen as "Copy needed". The list of gaps is in `docs/copy-needed.md`.
   - `fonts/`: IBM Plex, hosted by us so readers' devices never contact Google.

@@ -17,7 +17,7 @@ export interface Tables {
   limits: string; // key: key
 }
 
-export function dynamoStore(tables: Tables, client = DynamoDBDocumentClient.from(new DynamoDBClient({}))): Store {
+export function dynamoStore(tables: Tables, client = DynamoDBDocumentClient.from(new DynamoDBClient({}), { marshallOptions: { removeUndefinedValues: true } })): Store {
   const nowSec = () => Math.floor(Date.now() / 1000);
   // The database removes expired records within a day or two; hide them meanwhile.
   const live = <T extends { expiresAt: number }>(v: unknown) => (v && (v as T).expiresAt >= nowSec() ? (v as T) : undefined);

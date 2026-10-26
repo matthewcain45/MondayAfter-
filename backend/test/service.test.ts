@@ -268,3 +268,46 @@ describe("sending a file", () => {
     await assert.rejects(env.api.sendFile("no-such-file"), /Unknown scenario/);
   });
 });
+
+describe("taking a break", () => {
+  const manageToken = async (env: ReturnType<typeof setup>, id: string) => /#t=(.{43})/.exec(await env.api.manageUrl(id))![1];
+
+  it("pauses the monthly emails for about 3 months, then they restart by themselves", async () => {
+    const env = setup();
+    const { sub } = await confirmedReader(env);
+    const manage = await manageToken(env, sub.id);
+    assert.deepEqual(await env.api.manageStatus(manage), { status: "subscribed" });
+    const { pausedUntil } = await env.api.pause(manage);
+    assert.equal(pausedUntil.slice(0, 10), "2027-02-01");
+    assert.deepEqual(await env.api.manageStatus(manage), { status: "paused", pausedUntil });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 0, failed: 0 });
+    env.clock.advance(92 * DAY);
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0 });
+    assert.deepEqual(await env.api.manageStatus(manage), { status: "subscribed" });
+  });
+
+  it("can be resumed early", async () => {
+    const env = setup();
+    const { sub } = await confirmedReader(env);
+    const manage = await manageToken(env, sub.id);
+    await env.api.pause(manage);
+    await env.api.resume(manage);
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0 });
+  });
+
+  it("doesn't reveal the email address, and refuses to pause an unsubscribed reader", async () => {
+    const env = setup();
+    const { sub } = await confirmedReader(env);
+    const manage = await manageToken(env, sub.id);
+    assert.ok(!JSON.stringify(await env.api.manageStatus(manage)).includes("@"));
+    await env.api.unsubscribe(manage);
+    assert.deepEqual(await env.api.manageStatus(manage), { status: "unsubscribed" });
+    await rejects(env.api.pause(manage), 409);
+  });
+
+  it("needs a manage link, not a file link", async () => {
+    const env = setup();
+    const { token } = await confirmedReader(env);
+    await rejects(env.api.pause(token), 401);
+  });
+});

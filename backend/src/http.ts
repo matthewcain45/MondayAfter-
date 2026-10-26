@@ -27,6 +27,9 @@ export const ROUTES: Record<string, { method: string; path: string; run: Handler
   saveRecorder: { method: "PUT", path: "/api/file/recorder", run: (svc, t, b) => svc.saveRecorder(t, b) },
   emailRecorder: { method: "POST", path: "/api/file/recorder/email", run: (svc, t) => svc.emailRecorder(t) },
   track: { method: "POST", path: "/api/events", run: (svc, t, b) => svc.track(t, b) },
+  manageStatus: { method: "POST", path: "/api/manage", run: (svc, t) => svc.manageStatus(t) },
+  pause: { method: "POST", path: "/api/pause", run: (svc, t) => svc.pause(t) },
+  resume: { method: "POST", path: "/api/resume", run: (svc, t) => svc.resume(t) },
   unsubscribe: { method: "POST", path: "/api/unsubscribe", run: (svc, t) => svc.unsubscribe(t) },
   deleteMe: { method: "POST", path: "/api/delete", run: (svc, t) => svc.deleteMe(t) },
 };

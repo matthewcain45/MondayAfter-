@@ -8,7 +8,7 @@ function footer(manageUrl: string): string {
     "",
     "--",
     "The Monday After, from Capstone Global Advisory.",
-    "Unsubscribe or delete your data: " + manageUrl,
+    "Take a break, unsubscribe or delete your data: " + manageUrl,
   ].join("\n");
 }
 

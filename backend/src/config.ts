@@ -9,6 +9,7 @@ export const LIMITS = {
   manageLinkSeconds: 730 * DAY, // unsubscribe / delete-my-data link in every email
   pendingSignupSeconds: 7 * DAY, // unconfirmed sign-ups are deleted after this
   retentionSeconds: 730 * DAY, // keep data for 2 years
+  pauseSeconds: 91 * DAY, // "take a break" pauses the monthly emails for about 3 months
 
   signupsPerIpPerHour: 5,
   signupsPerEmailPerDay: 3,

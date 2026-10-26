@@ -97,7 +97,8 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
     async sendFile(scenarioId: string, options: { pauseMs?: number } = {}): Promise<{ sent: number; failed: number }> {
       const scenario = scenarios[scenarioId];
       if (!scenario?.email) throw new Error("Unknown scenario, or it has no email: " + scenarioId);
-      const readers = (await store.listSubscribers()).filter((s) => s.status === "confirmed");
+      const now = clock.now().toISOString();
+      const readers = (await store.listSubscribers()).filter((s) => s.status === "confirmed" && !(s.pausedUntil && s.pausedUntil > now));
       let sent = 0;
       let failed = 0;
       for (const r of readers) {
@@ -172,6 +173,29 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       if (typeof e.name !== "string" || !EVENT_NAMES.has(e.name)) throw new ApiError(400, "Unknown event");
       if (e.target !== undefined && (typeof e.target !== "string" || !/^[A-Za-z0-9:_-]{1,60}$/.test(e.target))) throw new ApiError(400, "Bad event");
       await store.putEvent({ subscriberId: subscriber.id, scenarioId: scenario.id, at: nowIso(), name: e.name, target: e.target as string | undefined, expiresAt: epoch(LIMITS.retentionSeconds) });
+      return { ok: true };
+    },
+
+    // What the manage page shows. Deliberately not the email address: anyone
+    // holding a forwarded email shouldn't learn more from the link than the email says.
+    async manageStatus(token: unknown): Promise<{ status: "subscribed" | "paused" | "unsubscribed"; pausedUntil?: string }> {
+      const { subscriber } = await resolve(token, "manage");
+      if (subscriber.status === "unsubscribed") return { status: "unsubscribed" };
+      if (subscriber.pausedUntil && subscriber.pausedUntil > nowIso()) return { status: "paused", pausedUntil: subscriber.pausedUntil };
+      return { status: "subscribed" };
+    },
+
+    async pause(token: unknown): Promise<{ pausedUntil: string }> {
+      const { subscriber } = await resolve(token, "manage");
+      if (subscriber.status === "unsubscribed") throw new ApiError(409, "You're unsubscribed, so there's nothing to pause.");
+      const pausedUntil = new Date(clock.now().getTime() + LIMITS.pauseSeconds * 1000).toISOString();
+      await store.putSubscriber({ ...subscriber, pausedUntil });
+      return { pausedUntil };
+    },
+
+    async resume(token: unknown): Promise<{ ok: true }> {
+      const { subscriber } = await resolve(token, "manage");
+      await store.putSubscriber({ ...subscriber, pausedUntil: undefined });
       return { ok: true };
     },
 

@@ -60,9 +60,34 @@
 
   if (page === "manage") {
     const token = takeToken("tma:manage");
-    if (!token) show("manage-missing");
     const fail = (err) => { $("manage-error").textContent = err.status ? err.message : "Couldn't reach us. Check your connection and try again."; };
-    $("unsubscribe").addEventListener("click", () => post("/unsubscribe", token).then(() => show("manage-unsubscribed"), fail));
+    const longDate = (iso) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+    // Shows the right cards for where the reader is now: subscribed, on a break or unsubscribed.
+    function render(info) {
+      $("manage-error").textContent = "";
+      const paused = info.status === "paused";
+      const out = info.status === "unsubscribed";
+      $("pause-card").hidden = paused || out;
+      $("resume-card").hidden = !paused;
+      $("unsubscribe-card").hidden = out;
+      $("manage-state").textContent = out
+        ? "You're unsubscribed, so no more files will arrive. You can still delete your data below."
+        : paused ? "You're on a break from the monthly files." : "You get one incident file a month.";
+      if (paused) $("paused-until").textContent = "No files until " + longDate(info.pausedUntil) + ". They start again by themselves after that.";
+      show("manage-choose");
+    }
+    const refresh = () => post("/manage", token).then(render, (err) => {
+      if (err.status === 401) $("manage-missing-text").textContent = "This link has expired or isn't valid. Use the link at the bottom of your most recent Monday After email.";
+      else if (!err.status) $("manage-missing-text").textContent = "Couldn't reach us. Check your connection and reload this page.";
+      show("manage-missing");
+    });
+
+    if (!token) show("manage-missing");
+    else refresh();
+    $("pause").addEventListener("click", () => post("/pause", token).then(refresh, fail));
+    $("resume").addEventListener("click", () => post("/resume", token).then(refresh, fail));
+    $("unsubscribe").addEventListener("click", () => post("/unsubscribe", token).then(refresh, fail));
     $("delete-start").addEventListener("click", () => show("manage-confirm-delete"));
     $("delete-cancel").addEventListener("click", () => show("manage-choose"));
     $("delete-yes").addEventListener("click", () => post("/delete", token).then(() => {
