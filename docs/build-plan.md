@@ -95,13 +95,13 @@ Choices made in Phase 2, for the owner to confirm:
 
 ### Phase 4: Your address and email (you add the DNS records in Squarespace)
 
-- About 7 **new** DNS records:
+- About 8 **new** DNS records:
   - 1 for the website
   - 1 for the HTTPS certificate
   - 3 for email signing (DKIM)
   - 2 for the `mail.` sending address
+  - 1 DMARC record in monitor-only mode (`p=none`), approved by the owner
 - No existing record is changed.
-- Confirm your existing DMARC setting is compatible. With email signing set up correctly, it should be.
 - Ask AWS to take SES out of "sandbox" mode so it can email any subscriber.
 - **You check:** `themondayafter.capstoneglobaladvisory.com` loads with a padlock, and a test email arrives in your inbox (not spam), sent from the new address.
 
