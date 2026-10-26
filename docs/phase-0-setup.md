@@ -47,6 +47,7 @@ This gives you a personal sign-in page for both accounts. Sign-ins are short-liv
 1. In the console search bar, type **IAM Identity Center** and open it.
 2. Check that the region (top right) shows **Europe (London) eu-west-2**. Change it if not, because this is hard to move later.
 3. Click **Enable**. If asked, choose to enable it **with AWS Organizations**.
+   - **If you see "You have already registered another region":** Identity Center is already switched on in a different region, and only one is allowed. Find it by changing the region selector (top right) and reopening IAM Identity Center. Try **US East (N. Virginia)** first, then **Europe (Ireland)**. The region where the dashboard opens normally is the right one. **Keep using that region.** It only decides where your sign-in details are kept, not where The Monday After runs. Don't delete it to start again in London. Carry on from point 4 there.
 4. **Make two-factor sign-in compulsory:** go to **Settings**, then **Authentication**, then **Multi-factor authentication**, then **Configure**. Choose to prompt users **every time they sign in**, and to **require them to register an MFA device** at sign-in. Save.
 5. **Create your user:** go to **Users**, then **Add user**. Enter a username (for example your first name) and your work email. Skip the groups step and finish.
 6. You'll receive an invitation email. Accept it, choose a password, and register your phone or passkey as the second factor.
