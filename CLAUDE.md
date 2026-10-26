@@ -71,7 +71,12 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Keep data for 2 years**, then delete it. Unsubscribing and deletion on request must work.
 - **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page.
 - **Scenario content:** the owner provides the text and it is added to the project. There is no editing screen, so there is less to attack.
-- **Domain:** run under the owner's existing domain, `capstoneglobaladvisory.com`. Their stated preference is the address `capstoneglobaladvisory.com/themondayafter`. A subdomain has been recommended instead and is awaiting their decision. That domain also carries the business's website and email, so any DNS change to it is "ask first" and must not affect the existing site or email.
+- **Web address:** `themondayafter.capstoneglobaladvisory.com`, a subdomain of the owner's existing business domain.
+  - The domain's DNS is managed in **Squarespace**, which also connects the business's **Google Workspace** email. The main business website is a separate S3 site.
+  - **Only ever add DNS records. Never change or delete existing ones**, especially the email records (MX, SPF, DKIM, DMARC). Every DNS change is "ask first". Give the owner exact step-by-step instructions, because they add the records in Squarespace themselves.
+  - Never modify the existing business website or its S3 bucket.
+- **Email:** sent through SES from `themondayafter@capstoneglobaladvisory.com`, with replies going to the owner's Google Workspace inbox. Use a separate "MAIL FROM" subdomain (for example `mail.capstoneglobaladvisory.com`) so the main domain's existing SPF record never needs editing.
+- **Data controller:** Capstone Global Advisory. The privacy notice must name the business.
 
 ## Notes from the screens
 
