@@ -1,0 +1,288 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-23T10:15:00Z"
+  },
+  "title": "The Monday After: Incident File 01",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "1 Email"
+    },
+    "Scene.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "2 Scene"
+    },
+    "Decision1.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "3 Decision 1"
+    },
+    "Holding.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "4 Who's holding the phone?"
+    },
+    "Reveal1.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "5 Reveal 1"
+    },
+    "Twist.dc.html": {
+      "x": 0,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "6 Double twist"
+    },
+    "Decision2.dc.html": {
+      "x": 470,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "7 Decision 2"
+    },
+    "Log.dc.html": {
+      "x": 940,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "8 Flight recorder"
+    },
+    "Predict.dc.html": {
+      "x": 1410,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "9 Forecast"
+    },
+    "Reveal2.dc.html": {
+      "x": 1880,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "10 Reveal 2: the ledger"
+    },
+    "Commit.dc.html": {
+      "x": 2350,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "11 Take one thing back"
+    },
+    "Closing.dc.html": {
+      "x": 2820,
+      "y": 1700,
+      "w": 390,
+      "h": 844,
+      "title": "12 Closing line and soft door"
+    },
+    "Leadership.dc.html": {
+      "x": 0,
+      "y": 3400,
+      "w": 390,
+      "h": 844,
+      "title": "T1 Are you owning this?"
+    },
+    "WhoChecks.dc.html": {
+      "x": 470,
+      "y": 3400,
+      "w": 390,
+      "h": 844,
+      "title": "T2 Who should have checked?"
+    },
+    "Clock.dc.html": {
+      "x": 940,
+      "y": 3400,
+      "w": 390,
+      "h": 844,
+      "title": "T3 The clock"
+    },
+    "OtherCustomers.dc.html": {
+      "x": 1410,
+      "y": 3400,
+      "w": 390,
+      "h": 844,
+      "title": "T4 Not the only customer"
+    },
+    "LedgerRow.dc.html": {
+      "x": 1880,
+      "y": 3400,
+      "w": 390,
+      "h": 844,
+      "title": "T5 Open a ledger row"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Scene.dc.html",
+    "Decision1.dc.html",
+    "Holding.dc.html",
+    "Reveal1.dc.html",
+    "Twist.dc.html",
+    "Decision2.dc.html",
+    "Log.dc.html",
+    "Predict.dc.html",
+    "Reveal2.dc.html",
+    "Commit.dc.html",
+    "Closing.dc.html",
+    "Leadership.dc.html",
+    "WhoChecks.dc.html",
+    "Clock.dc.html",
+    "OtherCustomers.dc.html",
+    "LedgerRow.dc.html"
+  ],
+  "notes": {
+    "t1": {
+      "x": 0,
+      "y": -300,
+      "text": "1 \u00b7 The hook: email to first reveal",
+      "kind": "title1",
+      "maxW": 2270
+    },
+    "t2": {
+      "x": 0,
+      "y": 1400,
+      "text": "2 \u00b7 The core path: twist to the ledger",
+      "kind": "title1",
+      "maxW": 3200
+    },
+    "t3": {
+      "x": 0,
+      "y": 3100,
+      "text": "3 \u00b7 Threads: optional detours, pulled where the question arises",
+      "kind": "title1",
+      "maxW": 2270
+    },
+    "s_email": {
+      "x": 45,
+      "y": 900,
+      "w": 300,
+      "size": "m",
+      "fill": "gray",
+      "text": "Readable in 20 seconds, one button. Magic link, no login. Subject: 'Your temps and contractors haven't been paid. Nobody will say why.' Preheader: 'A 6-minute scenario. Your first decision takes 2 minutes.'"
+    },
+    "s_scene": {
+      "x": 515,
+      "y": 900,
+      "w": 300,
+      "size": "m",
+      "fill": "gray",
+      "text": "One screen, no scrolling. The nuance sits in the chips: weekly pay, fractional hours, some in IT, contract owned by HR."
+    },
+    "s_d1": {
+      "x": 985,
+      "y": 900,
+      "w": 300,
+      "size": "m",
+      "fill": "blue",
+      "text": "Commit first. Pick one or two before seeing anything. Combinations tell a different story from single choices."
+    },
+    "s_hold": {
+      "x": 1455,
+      "y": 900,
+      "w": 300,
+      "size": "m",
+      "fill": "blue",
+      "text": "Only appears if B is picked. Mandatory, no reveal here. It feeds Reveal 1. B-choosers also get the thread chip \"Are you owning this?\" (T1)."
+    },
+    "s_r1": {
+      "x": 1925,
+      "y": 900,
+      "w": 300,
+      "size": "m",
+      "fill": "orange",
+      "text": "First payoff, about 2 minutes in. Shows only the hidden assumptions; gains and costs stay hidden. The flag on each card captures \"I'd check this in my own organisation\" in one tap."
+    },
+    "s_twist": {
+      "x": 45,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "gray",
+      "text": "Double twist. Two thread chips attach to the exact lines that raise them: the clock (T3) and who should have checked (T2). Thread dots in the header show how many you have pulled."
+    },
+    "s_d2": {
+      "x": 515,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "blue",
+      "text": "The menu is shaped by Decision 1. Saturday 14:00 chip leads to T4. Locking in goes to the flight recorder, not straight to the forecast."
+    },
+    "s_pred": {
+      "x": 1455,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "blue",
+      "text": "One tap. A small stake before the ledger appears, so the gap between guess and result makes people stop and reread."
+    },
+    "s_r2": {
+      "x": 1925,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "orange",
+      "text": "THE \"WORTH MY TIME\" LINE. A state, not a debrief. 5 rows on the surface, 2 behind a tap. Flag what you would take back; threads you pulled add rows here."
+    },
+    "s_close": {
+      "x": 2865,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "green",
+      "text": "Safe exit. A mirror built from their own choices, the action they took back, a share prompt, then the soft door."
+    },
+    "s_depth": {
+      "x": 45,
+      "y": 4304,
+      "w": 300,
+      "size": "m",
+      "fill": "gray",
+      "text": "Threads are optional, about a minute, same mechanic (choice, assumption, gain and cost). Each has its own mini-payoff. T1 to T4 attach to the screens named in the chips; T5 opens from a ledger row."
+    },
+    "s_parked": {
+      "x": 515,
+      "y": 4304,
+      "w": 300,
+      "size": "m",
+      "fill": "gray",
+      "text": "Parked for later: replay, more threads, a lighter register test, slower reveals once trust is earned. Decide: whether the 30-day follow-up is promised on screen."
+    },
+    "s_log": {
+      "x": 985,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "blue",
+      "text": "A forecast of your own behaviour, written before the reveal. First hour required, day and week optional. Skip has equal weight. Not a promise: it is what the replay compares against."
+    },
+    "s_commit": {
+      "x": 2395,
+      "y": 2604,
+      "w": 300,
+      "size": "m",
+      "fill": "green",
+      "text": "One real-world action, chosen from what you flagged. A date and an opt-in 30-day follow-up email. The closing line mirrors it."
+    }
+  },
+  "designSystems": []
+}
