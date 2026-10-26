@@ -15,7 +15,7 @@ This creates a "trust" setting in AWS. It lets this GitHub project's buttons get
 3. Check that the region (top right) says **Europe (London)**.
 4. In the search bar, type **CloudFormation** and open it. Click **Create stack**, then **With new resources (standard)**.
 5. Choose **Upload a template file**, then **Choose file**, and pick the file you downloaded. Click **Next**.
-6. **Stack name:** `tma-github-deploy`. Leave both settings as they are. Click **Next**, then **Next** again.
+6. **Stack name:** `tma-github-deploy`. Leave both settings as they are. Click **Next**, then **Next** again. (If the Deploy button later fails with "Not authorized to perform sts:AssumeRoleWithWebIdentity", compare the `sub:` line in the run's **Sign-in details** with these settings.)
 7. At the bottom, tick **"I acknowledge that AWS CloudFormation might create IAM resources with custom names"**, then **Submit**.
 8. Wait until the status says **CREATE_COMPLETE**, about a minute. Click the **Outputs** tab and copy the **RoleArn** value. It starts `arn:aws:iam::`.
 9. **Tell GitHub about it:** in the GitHub project, go to **Settings**, then **Secrets and variables**, then **Actions**. Open the **Variables** tab and click **New repository variable**.

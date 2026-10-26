@@ -10,8 +10,11 @@ Description: Lets The Monday After's GitHub buttons deploy to this account, with
 Parameters:
   GitHubRepository:
     Type: String
-    Default: matthewcain45/MondayAfter-
-    Description: The GitHub project allowed to deploy (owner/name).
+    Default: matthewcain45@348284796/MondayAfter-@1434344225
+    Description: >-
+      The GitHub project allowed to deploy, as GitHub identifies it to AWS:
+      owner@ownerId/name@projectId. The ID numbers never change, so a project
+      created later with the same name can't pass as this one.
   AllowedBranch:
     Type: String
     Default: claude/monday-after-claude-md-tnf5n3
@@ -46,6 +49,7 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
               StringEqualsIgnoreCase:
                 token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:ref:refs/heads/${AllowedBranch}
+                # Shown by the "Show GitHub's sign-in details" step of the Deploy button.
       # Broad access inside this account only, needed to build everything the
       # first time. It can't reach your main account. To be narrowed later.
       ManagedPolicyArns:
