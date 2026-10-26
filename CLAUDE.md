@@ -82,7 +82,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - **Email:** sent through SES from `themondayafter@capstoneglobaladvisory.com`, with replies going to the owner's Google Workspace inbox. Use a separate "MAIL FROM" subdomain (for example `mail.capstoneglobaladvisory.com`) so the main domain's existing SPF record never needs editing.
 - **AWS account:** a separate AWS account just for The Monday After, linked to the owner's existing account through AWS Organizations so there is one bill. Never touch the main account's resources.
 - **Sending address:** `themondayafter@capstoneglobaladvisory.com` doesn't exist yet. Recommended: create it as a free alias in Google Workspace.
-- **DMARC:** the owner thinks the domain already has a DMARC record. Confirm it before the email setup, and don't change it.
+- **DMARC:** the owner found no `_dmarc` record in Squarespace. The recommendation is to add one in monitor-only mode (`p=none`) during Phase 4. That's an addition, not a change, but it affects the business's email too, so it needs the owner's OK.
 - **Data controller:** Capstone Global Advisory. The privacy notice must name the business.
 
 ## Notes from the screens
