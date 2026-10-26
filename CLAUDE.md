@@ -53,6 +53,33 @@ When asking, explain the choice in plain English, give a recommendation, and say
 - Don't add features, services or dependencies that weren't asked for — suggest them instead.
 - Before adding a new library or service, say what it does, why it's needed, and whether it has any cost or privacy implications.
 
+## Decisions made so far
+
+Agreed with the project owner. Changing any of these is an "ask first" decision.
+
+- **Everything on AWS, serverless**, in the London region (`eu-west-2`). No servers to manage.
+  - Web pages: S3 + CloudFront
+  - Saving answers: Lambda behind API Gateway
+  - Storing subscribers and answers: DynamoDB
+  - Sending email: Amazon SES
+  - Infrastructure written as code (AWS CDK) rather than clicked together in the console
+- **Scale:** up to about 50 users. Keep running costs as close to zero as possible, and set a spending alert.
+- **Sign-up:** a sign-up form on a web page (needs email confirmation and spam protection).
+- **Magic link:** the link in each email is unique to one subscriber and one scenario. It can't be guessed, it expires, and only a scrambled version is stored. The screens promise "No login".
+- **Answers are linked to subscribers** so we can send them reports later. Subscriber emails are stored apart from answers, which use an internal ID.
+- **Readers can change their answers.** Store only the latest choice, not the history.
+- **Keep data for 2 years**, then delete it. Unsubscribing and deletion on request must work.
+- **Admin view:** a private spreadsheet (CSV) export for the owner only. No admin web page.
+- **Scenario content:** the owner provides the text and it is added to the project. There is no editing screen, so there is less to attack.
+- **Domain:** to be bought through Route 53. The name is not chosen yet.
+
+## Notes from the screens
+
+- See `screens/README.md` for the flow rules, the open decisions and the design tokens.
+- The flight recorder (screen 8) holds free text. It is the most sensitive data we store: keep it private to the reader.
+- "Share this file" (screen 12) must share a general link, never the reader's personal magic link.
+- The screens load fonts from Google Fonts. In the real build, host the fonts ourselves so readers' devices don't contact Google.
+
 ## Project status
 
-The project is at an early stage. The technical setup (how the pages are built and hosted, and how emails are sent) has not been decided yet. Any decision about this falls under "ask first" above. When it is decided, record it here, along with how to run and check the project locally.
+Early stage: the design is agreed and the setup has been chosen, but no code has been written yet. When the build starts, record here how to run and check the project locally.
