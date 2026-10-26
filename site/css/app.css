@@ -149,3 +149,16 @@ textarea { width: 100%; min-height: 76px; padding: 12px 14px; border: 1px solid 
 .todo { display: inline; padding: 0 4px; border: 1px dashed var(--coral); border-radius: 4px; color: var(--coral); font-style: italic; }
 .todo::before { content: "Copy needed: "; font-style: normal; font-weight: 600; }
 .row-tools .todo { font-size: 0.7rem; }
+
+/* Saving status, shown only when something didn't save */
+.save-notice { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(440px, calc(100% - 32px)); margin: 0; padding: 10px 14px; border: 1px solid var(--coral); border-radius: 12px; background: var(--panel2); color: var(--text); font-size: 0.875rem; }
+.save-notice[hidden] { display: none; }
+
+/* Sign-up and account pages */
+input[type="email"] { width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); font-size: 1rem; }
+.trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.prose { display: flex; flex-direction: column; gap: 12px; font-size: 0.94rem; line-height: 1.5; color: var(--soft); }
+.prose h2 { margin: 12px 0 0; font-size: 1rem; color: var(--text); }
+.prose p, .prose ul { margin: 0; }
+.prose a, .small a { color: var(--amber); }
+.draft-banner { padding: 8px 12px; border: 1px dashed var(--coral); border-radius: 10px; color: var(--coral); font-size: 0.8125rem; }

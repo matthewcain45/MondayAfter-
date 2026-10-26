@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1621">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="tma-api" content="/api">
+<title>Confirm · The Monday After</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body data-page="confirm">
+<main class="screen">
+  <div class="top"><span>The Monday After</span><span>Confirm</span></div>
+  <div class="body">
+    <section id="confirm-wait" data-step>
+      <p class="intro">Confirming your email…</p>
+    </section>
+    <section id="confirm-done" data-step hidden>
+      <h1 class="big">You're in.</h1>
+      <p class="intro" style="font-size:.94rem">Your first incident file arrives with the next monthly email. Keep an eye out for The Monday After.</p>
+    </section>
+    <section id="confirm-failed" data-step hidden>
+      <h1>That didn't work.</h1>
+      <p id="confirm-failed-text" class="intro" style="font-size:.94rem">This page needs the link from your confirm email.</p>
+      <a class="btn secondary" href="signup.html">Sign up again</a>
+    </section>
+  </div>
+</main>
+<script src="js/pages.js" defer></script>
+</body>
+</html>

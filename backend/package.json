@@ -1,0 +1,22 @@
+{
+  "name": "the-monday-after-backend",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --test --test-reporter=spec \"test/**/*.test.ts\"",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.1150.0",
+    "@aws-sdk/client-kms": "3.1150.0",
+    "@aws-sdk/client-sesv2": "3.1150.0",
+    "@aws-sdk/lib-dynamodb": "3.1150.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "typescript": "5.9.3"
+  }
+}

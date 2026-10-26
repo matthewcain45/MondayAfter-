@@ -94,24 +94,35 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 ## Project status
 
-**Phase 1 (pages) is built.** Answers are saved only in the reader's browser for now. Phase 2 adds the backend.
+**Phase 1 (pages) and Phase 2 (saving, sign-up, analytics and export) are built and tested on this computer.** Nothing is on AWS yet. Phase 3 (a test copy on AWS) needs the owner's OK.
 
 ### How the code is laid out
 
 - `site/`: the website, made of plain HTML, CSS and JavaScript with no framework and no build step.
-  - `site/index.html`, `site/js/app.js`, `site/css/app.css`: the app itself.
-  - `site/scenarios/<id>.json`: **all the words and rules for one month's scenario.** A new month means a new file. Copy the author hasn't written yet is marked `{ "todo": "..." }` and shows on screen as "Copy needed".
-  - `site/fonts/`: IBM Plex, hosted by us so readers' devices never contact Google.
-  - `site/preview/email.html`: a mock of the email, for previews only.
-- `scripts/`: helper tools that use Node's built-in modules only, so nothing needs installing.
+  - `index.html` with `js/app.js`: the scenario app. It runs in **live** mode when opened from a personal link (`#t=TOKEN`) and saves to the backend. It runs in **preview** mode with `?preview`, or where there's no `tma-api` meta tag, and keeps answers in the browser only.
+  - `signup.html`, `confirm.html`, `manage.html` with `js/pages.js`: sign-up, confirming, and unsubscribe or delete.
+  - `privacy.html`: a draft, to be finished in Phase 5.
+  - `scenarios/<id>.json`: **all the words and rules for one month's scenario.** A new month means a new file, plus one import line in `backend/src/scenarios.ts`. Copy the author hasn't written yet is marked `{ "todo": "..." }` and shows on screen as "Copy needed". The list of gaps is in `docs/copy-needed.md`.
+  - `fonts/`: IBM Plex, hosted by us so readers' devices never contact Google.
+  - `preview/email.html`: a mock of the email, for previews only.
+- `backend/`: the saving code, in TypeScript. Node 22 runs it directly, with no build step for tests.
+  - `src/service.ts`: what the backend does. `src/validate.ts`: strict checks on everything readers send. `src/http.ts`: the web routes. `src/export.ts`: the owner's spreadsheets.
+  - `src/adapters/aws.ts`: the real DynamoDB, KMS and SES connections. `src/adapters/memory.ts`: stand-ins for tests and the local preview.
+  - `src/lambda.ts`: the two AWS Lambda entry points. `api` can lock flight recorders but not unlock them. `recorderMailer` is the only code that can unlock one, and it only sends it to the reader's own email.
+  - `src/config.ts`: link lifetimes, submission limits and retention. Changing these is an "ask first" decision.
+- `scripts/`: `preview.mjs` (local preview with the real backend code) and `check-scenario.mjs` (lists copy still needed and checks the rules are valid).
 
 ### How to run and check it locally
 
-- Preview: `node scripts/preview.mjs`, then open `http://localhost:8080/preview/email.html`. Add `?reset=1` to the app address to start fresh.
-- List the copy still needed and check that the rules are valid: `node scripts/check-scenario.mjs incident-file-01`
+- Tests: `cd backend && npm install && npm test`. Typecheck: `npm run typecheck`.
+- Preview: `node scripts/preview.mjs`, then open `http://localhost:8080/signup.html`. Sign up with a fake address such as `test.user@example.com`. The pretend emails appear at `http://localhost:8080/dev/`, with links to confirm. `/dev/send-file` sends Incident File 01, and `/dev/export` shows the spreadsheets. The `/dev/` pages exist only in the local preview and are never deployed.
+- Phone-style preview without the backend: `http://localhost:8080/preview/email.html`.
+- Copy check: `node scripts/check-scenario.mjs incident-file-01`
 
-### Rules for the app code
+### Rules for the code
 
-- Put scenario text into the page as text only. Never use `innerHTML` with scenario or reader content.
+- Put scenario text and reader input into pages as text only. Never use `innerHTML` with them.
+- Personal links travel in the `#t=` part of the address, which browsers don't send to servers. They are removed from the address bar straight away, and are sent to the backend only in the `Authorization` header. Never put them in query strings or logs.
 - "Share this file" shares a general link, never the reader's personal link.
-- Never send flight recorder text to `track()` or any log.
+- Flight recorder text goes only to `PUT /api/file/recorder`, and is encrypted there. Never put it in saved state, `track()`, logs or exports. The browser doesn't keep it in live mode.
+- Never log request bodies, email addresses or tokens.

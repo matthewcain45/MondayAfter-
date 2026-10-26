@@ -1,6 +1,7 @@
 // The Monday After: renders a scenario file as a series of mobile screens.
-// Phase 1: answers are kept only in this browser (localStorage). Phase 2 swaps
-// load()/save() for calls to the AWS backend, keyed by the reader's magic link.
+// Two modes:
+//   live    - opened from a reader's personal link; answers are saved to our backend
+//   preview - no personal link (or ?preview); answers stay in this browser only
 
 (function () {
   "use strict";
@@ -9,6 +10,9 @@
   let scenario = null;
   let state = null;
   let storageKey = "";
+  let mode = "preview";
+  let token = null;
+  const apiBase = (document.querySelector('meta[name="tma-api"]') || {}).content || "";
 
   // ---------- Small helpers ----------
 
@@ -49,9 +53,35 @@
     return span.firstChild;
   }
 
-  // Analytics placeholder. Phase 2 sends these to our own backend
-  // (no cookies, no third parties). Never pass flight recorder text here.
-  function track(/* name, detail */) {}
+  // ---------- Talking to our backend ----------
+
+  // The personal link travels in a header, never in the address, so it doesn't
+  // end up in logs or get shared by accident.
+  async function api(method, path, body) {
+    const res = await fetch(apiBase + path, {
+      method,
+      headers: Object.assign({ Authorization: "Bearer " + token }, body ? { "Content-Type": "application/json" } : {}),
+      body: body ? JSON.stringify(body) : undefined,
+      keepalive: method !== "GET",
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || "Something went wrong."), { status: res.status });
+    return data;
+  }
+
+  // Analytics go to our own backend only: no cookies, no third parties.
+  // Never pass flight recorder text here.
+  function track(name, target) {
+    if (mode !== "live") return;
+    api("POST", "/events", target ? { name, target: String(target) } : { name }).catch(() => {});
+  }
+
+  const notice = h("p", { class: "save-notice", role: "status" });
+  function showNotice(text) {
+    notice.textContent = text;
+    notice.hidden = !text;
+    if (!notice.isConnected) document.body.append(notice);
+  }
 
   // ---------- Saving and loading ----------
 
@@ -65,9 +95,27 @@
     } catch (e) { /* storage blocked or corrupt: start fresh */ }
     return blankState();
   }
+  let saveTimer = null;
   function save() {
-    try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (e) { /* preview still works without storage */ }
+    if (mode !== "live") {
+      try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch (e) { /* preview still works without storage */ }
+      return;
+    }
+    // Wait for a short pause in tapping, then send the latest answers.
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flush, 500);
   }
+  function flush() {
+    if (mode !== "live" || saveTimer === null) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    api("PUT", "/file/state", state).then(() => showNotice(""), (e) => {
+      if (e.status === 401) return expired(e.message);
+      showNotice("Not saved yet. Check your connection; we'll try again.");
+      saveTimer = setTimeout(flush, 5000);
+    });
+  }
+  window.addEventListener("pagehide", flush);
 
   // ---------- Rules (which screens, rows and lines apply) ----------
 
@@ -276,7 +324,7 @@
         e.stopPropagation();
         state.flags = on ? state.flags.filter((f) => f !== flagId) : state.flags.concat(flagId);
         save();
-        track("flag", { id: flagId, on: !on });
+        track(on ? "unflag" : "flag", flagId);
         route();
       },
     }, icon(ICON_FLAG));
@@ -287,7 +335,7 @@
   function renderScreen(s) {
     state.last = s.id;
     save();
-    track("screen", { id: s.id });
+    track("screen", s.id);
     ({ scene, choice, reveal, story, recorder, forecast, ledger, takeback, closing })[s.type](s);
   }
 
@@ -339,7 +387,7 @@
       options,
       s.footnote ? h("p", { class: "small", style: "margin:6px 0 0" }, s.footnote) : null,
       (s.threads || []).map((r) => threadChip(r, s.id)),
-    ], [s.counter ? status : null, primary(s.button, () => { track("lock", { id: s.id }); advance(s.id); }, ok)]);
+    ], [s.counter ? status : null, primary(s.button, () => { track("lock", s.id); advance(s.id); }, ok)]);
   }
 
   function reveal(s) {
@@ -384,11 +432,13 @@
   }
 
   function recorder(s) {
+    // In live mode the text goes straight to the backend, encrypted, and is
+    // never kept in the browser or shown again here; it can be emailed back.
     const saved = state.recorder && !state.recorder.skipped ? state.recorder : {};
     const error = h("p", { class: "error", role: "alert" });
     const fields = s.fields.map((f) => {
-      const ta = h("textarea", { id: "rec-" + f.id, maxlength: "2000", required: f.required ? "" : null, "aria-required": f.required ? "true" : null });
-      ta.value = saved[f.id] || "";
+      const ta = h("textarea", { id: "rec-" + f.id, maxlength: "1000", required: f.required ? "" : null, "aria-required": f.required ? "true" : null });
+      ta.value = mode === "live" ? "" : saved[f.id] || "";
       return { f, ta, el: h("label", { class: "field", for: "rec-" + f.id }, h("span", { class: "kicker amber" }, f.label), ta) };
     });
     page(s.header, s.title, [
@@ -396,18 +446,34 @@
       h("p", { class: "intro", style: "font-size:.94rem;color:var(--muted2)" }, s.intro),
       fields.map((x) => x.el),
       h("p", { class: "lockline" }, icon(ICON_LOCK), h("span", {}, s.privacy)),
+      mode === "live" && saved.savedAt ? h("p", { class: "small", style: "margin:0" }, "You saved your flight recorder on " + new Date(saved.savedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) + ". Saving again replaces it.") : null,
       error,
     ], [
-      primary(s.button, () => {
+      primary(s.button, async () => {
         const values = {};
         fields.forEach(({ f, ta }) => { values[f.id] = ta.value.trim(); });
         const missing = fields.find(({ f }) => f.required && !values[f.id]);
         if (missing) { error.textContent = "Please write something for the first hour, or skip."; missing.ta.focus(); return; }
-        state.recorder = Object.assign(values, { savedAt: new Date().toISOString() });
-        track("recorder", { saved: true }); // never the text itself
+        if (mode === "live") {
+          try {
+            const res = await api("PUT", "/file/recorder", values);
+            state.recorder = { saved: true, savedAt: res.savedAt };
+          } catch (e) {
+            if (e.status === 401) return expired(e.message);
+            error.textContent = e.status ? e.message : "Couldn't save. Check your connection and try again.";
+            return;
+          }
+        } else {
+          state.recorder = Object.assign(values, { savedAt: new Date().toISOString() });
+        }
+        track("recorder", "saved"); // never the text itself
         advance(s.id);
       }),
-      secondary(s.skip, () => { state.recorder = { skipped: true }; track("recorder", { saved: false }); advance(s.id); }),
+      secondary(s.skip, () => {
+        if (!saved.savedAt) state.recorder = { skipped: true };
+        track("recorder", "skipped");
+        advance(s.id);
+      }),
     ]);
   }
 
@@ -421,7 +487,7 @@
         h("button", { class: "option plain", type: "button", role: "radio", "aria-checked": String(pick === o.id), onclick: () => { state.answers[s.id] = o.id; save(); route(); } },
           h("span", { class: "t", style: "font-size:1rem" }, o.title)))),
     ], [
-      primary(s.button, () => { track("forecast", { id: pick }); advance(s.id); }, !!pick),
+      primary(s.button, () => { track("forecast", pick); advance(s.id); }, !!pick),
       h("p", { class: "lockline", style: "justify-content:center;margin:0" }, icon(ICON_LOCK), h("span", {}, s.privacy)),
     ]);
   }
@@ -484,7 +550,7 @@
         error);
     }
 
-    const close = (value) => { state.takeBack = value; state.closed = true; track("close", { tookBack: !value.skipped }); advance(s.id); };
+    const close = (value) => { state.takeBack = value; state.closed = true; track("close", value.skipped ? "skipped" : "took-back"); advance(s.id); };
     page(s.header, s.title, content, [
       items.length ? primary(s.button, () => {
         if (!tb.item) { error.textContent = "Pick one thing to take back, or skip."; return; }
@@ -499,7 +565,18 @@
     const tb = state.takeBack && !state.takeBack.skipped && !state.takeBack.draft ? state.takeBack : null;
     const item = tb && takeBackCandidates().find((i) => i.id === tb.item);
     const when = tb && tbScreen.whenOptions.find((w) => w.id === tb.when);
-    const hasRecorder = state.recorder && !state.recorder.skipped && state.recorder.hour;
+    const hasRecorder = state.recorder && !state.recorder.skipped && (state.recorder.saved || state.recorder.hour);
+    const emailRecorder = async () => {
+      track("recorder-email");
+      if (mode !== "live") { recStatus.textContent = s.recorder.previewNote; return; }
+      recStatus.textContent = "Sending…";
+      try {
+        await api("POST", "/file/recorder/email");
+        recStatus.textContent = "Sent. Check your inbox.";
+      } catch (e) {
+        recStatus.textContent = e.status ? e.message : "Couldn't send. Check your connection and try again.";
+      }
+    };
     const recStatus = h("p", { class: "small", role: "status", style: "margin:0" });
     const shareStatus = h("p", { class: "small", role: "status", style: "margin:0" });
 
@@ -522,7 +599,7 @@
       item ? h("div", { class: "card" }, h("div", { class: "kicker teal" }, s.takingKicker),
         h("p", { class: "note-line" }, t(item.commit || item.label), " ", when ? when.phrase : "", tb.followUp ? " " + tbScreen.followUpPromise : "")) : null,
       hasRecorder ? h("div", { class: "card" }, h("div", { class: "kicker" }, s.recorder.kicker), h("p", { class: "note-line" }, s.recorder.text),
-        h("button", { class: "btn secondary small-btn", type: "button", onclick: () => { recStatus.textContent = s.recorder.previewNote; track("recorder-email"); } }, s.recorder.button), recStatus) : null,
+        h("button", { class: "btn secondary small-btn", type: "button", onclick: emailRecorder }, s.recorder.button), recStatus) : null,
       h("div", { class: "card" }, h("div", { class: "kicker" }, s.share.kicker), h("p", { class: "note-line" }, s.share.text),
         h("button", { class: "btn secondary small-btn", type: "button", onclick: share }, s.share.button), shareStatus),
       h("div", { class: "card outline-amber" }, h("p", { class: "note-line" }, s.team.text),
@@ -535,7 +612,7 @@
   function renderThread(id, fromId) {
     const th = scenario.threads[id];
     const back = screenById(fromId) ? fromId : state.last;
-    if (!state.pulled.includes(id)) { state.pulled.push(id); save(); track("thread", { id }); }
+    if (!state.pulled.includes(id)) { state.pulled.push(id); save(); track("thread", id); }
     const pick = state.threads[id];
     const chosen = th.options.find((o) => o.id === pick);
 
@@ -585,25 +662,62 @@
 
   // ---------- Start ----------
 
+  function message(title, text, link) {
+    app.replaceChildren(h("main", { class: "screen" }, h("div", { class: "body" }, h("h1", {}, title), h("p", { class: "intro", style: "font-size:.94rem" }, text),
+      link ? h("a", { class: "btn secondary", href: link.href, style: "margin-top:12px" }, link.label) : null)));
+    document.title = "The Monday After";
+  }
+  function expired(text) {
+    mode = "stopped";
+    try { sessionStorage.removeItem("tma:token"); } catch (e) { /* ignore */ }
+    message("This link has expired.", text || "Reply to any Monday After email and we'll send you a fresh one.");
+  }
+
+  async function loadScenario(id) {
+    if (!/^[a-z0-9-]+$/.test(id)) throw new Error("Bad file name");
+    const res = await fetch("scenarios/" + id + ".json", { cache: "no-cache" });
+    if (!res.ok) throw new Error("Scenario not found");
+    return res.json();
+  }
+
   async function start() {
     const params = new URLSearchParams(location.search);
-    const file = params.get("file") || "incident-file-01";
-    if (!/^[a-z0-9-]+$/.test(file)) throw new Error("Bad file name");
-    const res = await fetch("scenarios/" + file + ".json", { cache: "no-cache" });
-    if (!res.ok) throw new Error("Scenario not found");
-    scenario = await res.json();
-    storageKey = "tma:" + scenario.id;
-    if (params.has("reset")) {
-      try { localStorage.removeItem(storageKey); } catch (e) { /* ignore */ }
-      params.delete("reset");
-      history.replaceState(null, "", location.pathname + (params.toString() ? "?" + params : "") + location.hash);
+
+    // A personal link looks like ...#t=TOKEN. Take the token out of the address
+    // straight away, so it can't be bookmarked, shared or seen over a shoulder.
+    const fromLink = /^#t=([A-Za-z0-9_-]{43})$/.exec(location.hash);
+    try {
+      if (fromLink) sessionStorage.setItem("tma:token", fromLink[1]);
+      token = sessionStorage.getItem("tma:token");
+    } catch (e) { token = fromLink ? fromLink[1] : null; }
+    if (fromLink) history.replaceState(null, "", location.pathname + location.search);
+
+    if (apiBase && !params.has("preview")) {
+      if (!token) return message("Open this file from your email.", "Each Monday After file opens from the personal link in your email.", { href: "signup.html", label: "Not subscribed yet? Sign up" });
+      mode = "live";
+      let opened;
+      try {
+        opened = await api("GET", "/file");
+      } catch (e) {
+        if (e.status === 401) return expired(e.message);
+        return message("This file couldn't be opened.", "Check your connection and try the link in your email again.");
+      }
+      scenario = await loadScenario(opened.scenarioId);
+      state = Object.assign(blankState(), opened.state || {});
+      if (opened.recorder && !(state.recorder && state.recorder.saved)) state.recorder = opened.recorder;
+    } else {
+      scenario = await loadScenario(params.get("file") || "incident-file-01");
+      storageKey = "tma:" + scenario.id;
+      if (params.has("reset")) {
+        try { localStorage.removeItem(storageKey); } catch (e) { /* ignore */ }
+        params.delete("reset");
+        history.replaceState(null, "", location.pathname + (params.toString() ? "?" + params : "") + location.hash);
+      }
+      state = load();
     }
-    state = load();
     window.addEventListener("hashchange", route);
     route();
   }
 
-  start().catch(() => {
-    app.replaceChildren(h("main", { class: "screen" }, h("div", { class: "body" }, h("h1", {}, "This file couldn't be opened."), h("p", { class: "intro" }, "Please try the link in your email again."))));
-  });
+  start().catch(() => message("This file couldn't be opened.", "Please try the link in your email again."));
 })();

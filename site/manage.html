@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1621">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="tma-api" content="/api">
+<title>Your data · The Monday After</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body data-page="manage">
+<main class="screen">
+  <div class="top"><span>The Monday After</span><span>Your data</span></div>
+  <div class="body">
+    <section id="manage-choose" data-step>
+      <div class="body" style="padding:0;gap:12px">
+        <h1>Your emails and data.</h1>
+        <div class="card">
+          <h2 class="kicker amber">Stop the emails</h2>
+          <p class="note-line">No more monthly files. Your past answers are kept for up to 2 years, then deleted.</p>
+          <button id="unsubscribe" class="btn secondary small-btn" type="button">Unsubscribe</button>
+        </div>
+        <div class="card">
+          <h2 class="kicker coral">Delete everything</h2>
+          <p class="note-line">Deletes your email address, answers and flight recorders now. Your past answers won't appear in any future reports.</p>
+          <button id="delete-start" class="btn secondary small-btn" type="button">Delete my data</button>
+        </div>
+        <p id="manage-error" class="error" role="alert"></p>
+      </div>
+    </section>
+    <section id="manage-confirm-delete" data-step hidden>
+      <div class="body" style="padding:0;gap:12px">
+        <h1>Delete everything?</h1>
+        <p class="intro" style="font-size:.94rem">This can't be undone. You'll stop getting The Monday After, and we'll delete your email address, answers and flight recorders straight away.</p>
+        <button id="delete-yes" class="btn" type="button">Yes, delete my data</button>
+        <button id="delete-cancel" class="btn secondary" type="button">Cancel</button>
+      </div>
+    </section>
+    <section id="manage-unsubscribed" data-step hidden>
+      <h1>You're unsubscribed.</h1>
+      <p class="intro" style="font-size:.94rem">You won't get any more monthly files. You can still delete your data from the link in any past email.</p>
+    </section>
+    <section id="manage-deleted" data-step hidden>
+      <h1>Deleted.</h1>
+      <p class="intro" style="font-size:.94rem">We've deleted your email address, answers and flight recorders. Thank you for taking part.</p>
+    </section>
+    <section id="manage-missing" data-step hidden>
+      <h1>Use the link in your email.</h1>
+      <p class="intro" style="font-size:.94rem">To unsubscribe or delete your data, open the link at the bottom of any Monday After email.</p>
+    </section>
+  </div>
+</main>
+<script src="js/pages.js" defer></script>
+</body>
+</html>

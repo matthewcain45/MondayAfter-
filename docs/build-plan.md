@@ -1,6 +1,6 @@
 # Build plan: The Monday After (first version)
 
-Status: **approved by the owner, with the amendments below.** No code has been written yet.
+Status: **approved by the owner, with the amendments below.** Phases 1 and 2 are built and tested locally. Phase 3 is next and needs the owner's OK to deploy.
 
 ## What the first version includes
 
@@ -67,7 +67,16 @@ Each phase ends with something you can check. Anything that puts something live,
 - Answers are saved only in the browser for now, with made-up test data.
 - **You check:** I share a preview, and you click through it on your phone.
 
-### Phase 2: Saving answers and sign-up (still no AWS)
+### Phase 2: Saving answers and sign-up (still no AWS). Done
+
+Choices made in Phase 2, for the owner to confirm:
+- **How long links last:** the confirm link 24 hours, the monthly file link 90 days, and the unsubscribe or delete link 2 years.
+- Unconfirmed sign-ups are deleted after 7 days.
+- Opening a file restarts the reader's 2-year retention clock.
+- **Unsubscribing stops the emails but keeps past answers**, which are deleted after 2 years. "Delete my data" removes everything immediately.
+- A saved flight recorder isn't shown again in the app. Readers get it back by email.
+- **Email delivery figures** (sent, delivered, bounced) come from SES once sending is built in Phase 6. The summary spreadsheet starts from "opened their link".
+- The export runs locally for now. How the owner downloads it on AWS is settled in Phase 3.
 
 - The code for sign-up, confirming an email, opening a magic link, saving and changing answers, unsubscribing, deleting data, and the CSV export.
 - Security built in:
