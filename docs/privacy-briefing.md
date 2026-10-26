@@ -28,6 +28,19 @@ A free monthly email for aspiring CIOs. Each email holds a personal, expiring li
 - **Amazon Web Services:** hosting (S3, CloudFront), database (DynamoDB), email sending (SES), encryption keys (KMS), all in London (`eu-west-2`). CloudFront may serve a visit from an edge location in Europe or North America (price class 100).
 - **Google Workspace:** the owner's inbox, where replies land.
 
+## Owner's position (26 October 2026)
+
+These were decided by the owner and are reflected in the published notice. An adviser may still review them.
+
+1. **Lawful basis:** consent for all processing, including recording which screens readers reach.
+2. **Sign-up wording:** sufficient as it is.
+3. **Transfers:** the notice's wording is sufficient.
+4. **Erasure and backups:** the disclosure is adequate.
+5. **Flight recorder:** no DPIA needed.
+6. **Record of processing, and a postal address in the email footer:** not needed. (Already registered with the ICO.)
+7. **"The clock" thread:** still open.
+8. **Early sign-ups:** still open.
+
 ## Questions for you
 
 1. **Lawful basis.** The draft proposes consent for the emails and for storing answers and the flight recorder, and legitimate interests for recording which screens readers reach. Is that right? Should legitimate interests cover more, or less? Does the analytics use need a written legitimate interests assessment?
