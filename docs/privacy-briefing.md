@@ -1,7 +1,7 @@
 # The Monday After: briefing for the data protection review
 
 **For:** the data protection adviser reviewing The Monday After before launch.
-**From:** Capstone Global Advisory (data controller).
+**From:** Capstone Global Advisory (data controller): 3 Barnet Road, London, EN5 3HE. Company number 17164935. ICO registration ZC246344.
 **What to read:** the draft privacy notice at `https://themondayafter.capstoneglobaladvisory.com/privacy.html` (or `site/privacy.html`), the sign-up page at `/signup.html`, and "The clock" thread in Incident File 01. A summary of the facts and the open questions follows.
 
 ## The service in one paragraph
@@ -36,7 +36,6 @@ A free monthly email for aspiring CIOs. Each email holds a personal, expiring li
 4. **Erasure and backups.** Deletion is immediate in the live system. Point-in-time backups keep data for up to 35 days, and the SES suppression list keeps addresses that bounced or complained. Is the disclosure in the draft adequate?
 5. **Flight recorder.** It's free text. Readers are told "No names or confidential detail. Write it as a pattern." Could it attract special category data in practice? Is a DPIA advisable, or a short screening note enough?
 6. **Owner's obligations:**
-   - Is the ICO data protection fee due?
    - Should there be a record of processing activities?
    - Should the email footer carry a postal address?
 7. **"The clock" thread.** It asks questions about breach notification (controller or processor, and when the clock starts) and is labelled "Not legal advice". Please check that it doesn't mislead.
