@@ -114,7 +114,7 @@ The **email part was brought forward** on 26 October 2026, because Google held t
 - A privacy notice naming Capstone Global Advisory, linked from the sign-up page and from every email.
 - Check that unsubscribe, "delete my data" and 2-year deletion work.
 - A security review of the whole thing.
-- **An automated penetration test with AWS Security Agent**, run on the finished test copy (own web address, final copy and emails) after the security review and before any real readers sign up. Never run it on the live copy or the business website. It costs $50 per task-hour; the smallest budget cap is reportedly 20 hours (about $1,000), so check this. New customers get a 2-month free trial, so **switch it on only when ready**. Before running it:
+- **An automated penetration test with AWS Security Agent** (the brief is in `docs/pentest-brief.md`), run on the finished test copy (own web address, final copy and emails) after the security review and before any real readers sign up. Never run it on the live copy or the business website. It costs $50 per task-hour; the smallest budget cap is reportedly 20 hours (about $1,000), so check this. New customers get a 2-month free trial, so **switch it on only when ready**. Before running it:
   - write a short test brief (scope, focus areas, budget cap)
   - agree any temporary changes to submission limits and the SES sandbox (an "ask first" security decision)
   - confirm the current price and trial terms with the owner
