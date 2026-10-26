@@ -176,8 +176,28 @@
     return parts.join(" · ");
   }
 
+  // A row can have "variants": the first whose rule matches sets its effect
+  // (drain or deposit), one-line summary and detail. If none matches, the row
+  // isn't shown for this route.
   function ledgerRows() {
-    return screenById("ledger").rows.filter((r) => matches(r.when));
+    const out = [];
+    for (const r of screenById("ledger").rows) {
+      if (!matches(r.when)) continue;
+      if (!r.variants) { out.push(r); continue; }
+      const v = r.variants.find((x) => matches(x.when));
+      if (v) out.push(Object.assign({}, r, v, { when: r.when }));
+    }
+    return out;
+  }
+
+  // The closing line, built from parts: an opening from the first decision,
+  // a line that depends on one choice, and an ending from the second decision.
+  function mirrorText(m) {
+    if (!m || Array.isArray(m) || typeof m !== "object" || !m.opening) return variant(m);
+    const phrases = selected(m.opening.choice).map((id) => m.opening.phrases[id]).filter(Boolean);
+    const ending = m.ending.parts[selected(m.ending.choice)[0]];
+    if (!phrases.length || !ending) return variant(m.fallback);
+    return [m.opening.prefix + phrases.join(" and ") + ".", ending.did, variant(m.middle), ending.still].filter(Boolean).join(" ");
   }
 
   // Everything the reader could choose to "take back": threads they pulled,
@@ -592,9 +612,9 @@
       track("share");
     };
 
-    page(s.header, variant(s.mirror), [
+    page(s.header, mirrorText(s.mirror), [
       h("div", { class: "kicker amber" }, s.kicker),
-      h("h1", { class: "mirror" }, t(variant(s.mirror))),
+      h("h1", { class: "mirror" }, t(mirrorText(s.mirror))),
       h("p", { class: "tagline" }, s.tagline),
       item ? h("div", { class: "card" }, h("div", { class: "kicker teal" }, s.takingKicker),
         h("p", { class: "note-line" }, t(item.commit || item.label), " ", when ? when.phrase : "", tb.followUp ? " " + tbScreen.followUpPromise : "")) : null,

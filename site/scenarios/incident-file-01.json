@@ -3,7 +3,6 @@
   "title": "Incident File 01",
   "brand": "The Monday After",
   "replyAddress": "themondayafter@capstoneglobaladvisory.com",
-
   "email": {
     "subject": "Your temps and contractors haven't been paid. Nobody will say why.",
     "time": "FRIDAY, 16:40.",
@@ -17,31 +16,51 @@
     "button": "Make your first call →",
     "footnote": "2 minutes to your first decision. No login. A fictional scenario built on real patterns."
   },
-
   "screens": [
     {
       "id": "scene",
       "type": "scene",
-      "header": { "label": "Incident File 01 · The Monday After", "step": "1 of 5", "progress": 20 },
+      "header": {
+        "label": "Incident File 01 · The Monday After",
+        "step": "1 of 5",
+        "progress": 20
+      },
       "time": "Friday, 16:40",
       "title": "Your temps and contractors haven't been paid.",
-      "chips": ["Paid weekly", "Some on a few hours a week", "Some sit in IT", "Contract owned by HR"],
+      "chips": [
+        "Paid weekly",
+        "Some on a few hours a week",
+        "Some sit in IT",
+        "Contract owned by HR"
+      ],
       "know": {
         "kicker": "What you know",
-        "items": ["This week's pay hasn't landed.", "The agency says “a delay.” Its payroll provider says “a technical issue.”", "Monday is three days away."]
+        "items": [
+          "This week's pay hasn't landed.",
+          "The agency says “a delay.” Its payroll provider says “a technical issue.”",
+          "Monday is three days away."
+        ]
       },
       "dontKnow": {
         "kicker": "What you don't",
-        "items": ["Whether it's an outage or an attack", "Whether your data is safe", "Who these people are, in one list", "When pay will land"]
+        "items": [
+          "Whether it's an outage or an attack",
+          "Whether your data is safe",
+          "Who these people are, in one list",
+          "When pay will land"
+        ]
       },
       "button": "Next →",
       "footnote": "Your first move comes next."
     },
-
     {
       "id": "d1",
       "type": "choice",
-      "header": { "label": "Incident File 01 · The Monday After", "step": "2 of 5", "progress": 40 },
+      "header": {
+        "label": "Incident File 01 · The Monday After",
+        "step": "2 of 5",
+        "progress": 40
+      },
       "title": "Your first move.",
       "intro": "Pick one or two. You'll lock in before you see anything.",
       "min": 1,
@@ -50,45 +69,121 @@
       "keyStyle": "letter",
       "options": [
         {
-          "id": "A", "key": "A", "title": "Build the list.", "short": "Build the list",
+          "id": "A",
+          "key": "A",
+          "title": "Build the list.",
+          "short": "Build the list",
           "body": "Find out who these workers are, where they sit, and who is most exposed.",
-          "assumption": { "lens": "Technical architecture", "text": "The list can be built from access records, purchase orders and managers' memories, and the agency will share data lawfully." }
+          "assumption": {
+            "lens": "Technical architecture",
+            "text": "The list can be built from access records, purchase orders and managers' memories, and the agency will share data lawfully."
+          },
+          "takeBack": {
+            "label": "Check whether you could build a list of every temp and contractor today, and note which sources you would use.",
+            "from": "Reveal 1, build the list"
+          }
         },
         {
-          "id": "B", "key": "B", "title": "Press the agency.", "short": "Press the agency", "detailFrom": "holding",
+          "id": "B",
+          "key": "B",
+          "title": "Press the agency.",
+          "short": "Press the agency",
+          "detailFrom": "holding",
           "body": "Use the contract to demand facts and a date.",
-          "assumption": { "lens": "Governance", "text": "The agency can and will tell the truth, and a contract nobody in IT has read gives you leverage over their supplier." },
-          "takeBack": { "label": "Find out whether anyone has read the agency contract.", "from": "Reveal 1, press the agency" }
+          "assumption": {
+            "lens": "Governance",
+            "text": "The agency can and will tell the truth, and a contract nobody in IT has read gives you leverage over their supplier."
+          },
+          "takeBack": {
+            "label": "Find out whether anyone has read the agency contract.",
+            "from": "Reveal 1, press the agency"
+          }
         },
         {
-          "id": "C", "key": "C", "title": "Bridge the gap.", "short": "Bridge the gap",
+          "id": "C",
+          "key": "C",
+          "title": "Bridge the gap.",
+          "short": "Bridge the gap",
           "body": "Arrange emergency payments to the most exposed workers.",
-          "assumption": { "lens": { "todo": "Lens for ‘Bridge the gap’" }, "text": { "todo": "What ‘Bridge the gap’ assumes" } }
+          "assumption": {
+            "lens": "Governance",
+            "text": "Someone with the authority to approve an emergency payment can be found on a Saturday, and a lawful way to pay people outside the normal chain exists."
+          },
+          "takeBack": {
+            "label": "Find out who could approve an emergency payment to contractors, and how long it would take.",
+            "from": "Reveal 1, bridge the gap"
+          }
         },
         {
-          "id": "D", "key": "D", "title": "Tell the workers now.", "short": "Tell the workers now",
+          "id": "D",
+          "key": "D",
+          "title": "Tell the workers now.",
+          "short": "Tell the workers now",
           "body": "A short, honest message saying you don't yet know.",
-          "assumption": { "lens": { "todo": "Lens for ‘Tell the workers now’" }, "text": { "todo": "What ‘Tell the workers now’ assumes" } }
+          "assumption": {
+            "lens": "Leadership",
+            "text": "You know enough to say something true, and what you say will not be read as a promise to pay or an admission of fault."
+          },
+          "takeBack": {
+            "label": "Draft the first message you would send to contractors, and note who must approve it.",
+            "from": "Reveal 1, tell the workers now"
+          }
         },
         {
-          "id": "E", "key": "E", "title": "Talk to the unions and worker reps early.", "short": "Talk to the unions early",
-          "assumption": { "lens": { "todo": "Lens for ‘Talk to the unions’" }, "text": { "todo": "What ‘Talk to the unions’ assumes" } }
+          "id": "E",
+          "key": "E",
+          "title": "Talk to the unions and worker reps early.",
+          "short": "Talk to the unions early",
+          "assumption": {
+            "lens": "Organisational design",
+            "text": "Someone in your organisation already has a working relationship with worker representatives, and can speak for a workforce nobody has listed."
+          },
+          "takeBack": {
+            "label": "Find out who in your organisation talks to worker representatives, and meet them.",
+            "from": "Reveal 1, talk to the unions early"
+          }
         },
         {
-          "id": "F", "key": "F", "title": "Protect the critical work.", "short": "Protect the critical work",
+          "id": "F",
+          "key": "F",
+          "title": "Protect the critical work.",
+          "short": "Protect the critical work",
           "body": "Ask managers where the service leans on these workers, and plan for absences.",
-          "assumption": { "lens": { "todo": "Lens for ‘Protect the critical work’" }, "text": { "todo": "What ‘Protect the critical work’ assumes" } }
+          "assumption": {
+            "lens": "Technical architecture",
+            "text": "You know which services these people keep running, and which of them are on your incident team."
+          },
+          "takeBack": {
+            "label": "List the three pieces of work that must not stop, and who does each.",
+            "from": "Reveal 1, protect the critical work"
+          }
         }
       ],
       "button": "Lock in"
     },
-
     {
       "id": "holding",
       "type": "choice",
-      "showIf": { "picked": "d1:B" },
-      "header": { "label": "The Monday After", "step": "2 of 5", "progress": 40, "dots": true },
-      "route": { "kicker": "Your route so far", "lines": [{ "choices": ["d1"], "detail": false }] },
+      "showIf": {
+        "picked": "d1:B"
+      },
+      "header": {
+        "label": "The Monday After",
+        "step": "2 of 5",
+        "progress": 40,
+        "dots": true
+      },
+      "route": {
+        "kicker": "Your route so far",
+        "lines": [
+          {
+            "choices": [
+              "d1"
+            ],
+            "detail": false
+          }
+        ]
+      },
       "title": "Who's holding the phone?",
       "intro": "You chose to press the agency. The contract sits with HR. IT has never seen it. Choose one.",
       "min": 1,
@@ -96,182 +191,655 @@
       "keyStyle": "code",
       "options": [
         {
-          "id": "B1", "key": "B1", "title": "HR leads, IT supports.", "short": { "todo": "Short label for B1" },
+          "id": "B1",
+          "key": "B1",
+          "title": "HR leads, IT supports.",
+          "short": "HR leads",
           "body": "The contract owner makes the call.",
-          "assumption": { "lens": { "todo": "Lens for B1" }, "text": { "todo": "What ‘HR leads, IT supports’ assumes" } }
+          "assumption": {
+            "lens": "Organisational design",
+            "text": "HR can run a supplier incident, has the standing to ask other teams for help, and will tell you early enough for IT to matter."
+          },
+          "takeBack": {
+            "label": "Ask HR whether they have ever run a supplier incident, and what they would want from IT.",
+            "from": "Reveal 1, HR leads"
+          }
         },
         {
-          "id": "B2", "key": "B2", "title": "HR asks for your help, and you step in alongside.", "short": "HR asks, you step in",
+          "id": "B2",
+          "key": "B2",
+          "title": "HR asks for your help, and you step in alongside.",
+          "short": "HR asks, you step in",
           "body": "You work the problem together.",
-          "assumption": { "lens": "Leadership", "text": "HR will ask, you have capacity, and a working relationship exists to ask through." }
+          "assumption": {
+            "lens": "Leadership",
+            "text": "HR will ask, you have capacity, and a working relationship exists to ask through."
+          },
+          "takeBack": {
+            "label": "Agree with HR now how they would ask you for help, and who would answer.",
+            "from": "Reveal 1, HR asks, you step in"
+          }
         },
         {
-          "id": "B3", "key": "B3", "title": "You take the lead.", "short": { "todo": "Short label for B3" },
+          "id": "B3",
+          "key": "B3",
+          "title": "You take the lead.",
+          "short": "You take over",
           "body": "You pull it from HR because you think they can't handle it.",
-          "assumption": { "lens": { "todo": "Lens for B3" }, "text": { "todo": "What ‘You take the lead’ assumes" } }
+          "assumption": {
+            "lens": "Leadership",
+            "text": "HR will let go of it, the CEO will back you, and taking it will not cost you the relationship you need next time."
+          },
+          "takeBack": {
+            "label": "Agree with the CEO and HR, in advance, when IT takes the lead and when it does not.",
+            "from": "Reveal 1, you take over"
+          }
         }
       ],
       "footnote": "No right answer. Each one leaves something behind.",
-      "threads": [{ "thread": "t1", "needsAnswer": true }],
+      "threads": [
+        {
+          "thread": "t1",
+          "needsAnswer": true
+        }
+      ],
       "button": "Lock in"
     },
-
     {
       "id": "reveal1",
       "type": "reveal",
-      "header": { "label": "Incident File 01 · The Monday After", "step": "3 of 5", "progress": 60 },
+      "header": {
+        "label": "Incident File 01 · The Monday After",
+        "step": "3 of 5",
+        "progress": 60
+      },
       "title": "You're assuming…",
       "intro": "Every move rests on something you haven't checked. Tap the flag on anything you'd check in your own organisation.",
-      "from": ["d1", "holding"],
-      "costBox": { "kicker": "What this costs", "text": "It depends on what happens next." },
+      "from": [
+        "d1",
+        "holding"
+      ],
+      "costBox": {
+        "kicker": "What this costs",
+        "text": "It depends on what happens next."
+      },
       "button": "Saturday, 09:10 →"
     },
-
     {
       "id": "twist",
       "type": "story",
-      "header": { "label": "The Monday After", "step": "4 of 5", "progress": 80, "dots": true },
+      "header": {
+        "label": "The Monday After",
+        "step": "4 of 5",
+        "progress": 80,
+        "dots": true
+      },
       "blocks": [
-        { "type": "time", "text": "Saturday, 09:10" },
-        { "type": "card", "kicker": "Phone · The agency", "text": "The agency calls back. Its payroll provider “cannot rule out” a security incident. No pay date." },
-        { "type": "thread", "thread": "t3" },
-        { "type": "chat", "kicker": "Group chat · Contractors", "message": "Some of us won't come in Monday if we're not paid.", "alert": "Two of them are on your own incident team." },
         {
-          "type": "chain", "kicker": "Who you depend on",
+          "type": "time",
+          "text": "Saturday, 09:10"
+        },
+        {
+          "type": "card",
+          "kicker": "Phone · The agency",
+          "text": "The agency calls back. Its payroll provider “cannot rule out” a security incident. No pay date."
+        },
+        {
+          "type": "thread",
+          "thread": "t3"
+        },
+        {
+          "type": "chat",
+          "kicker": "Group chat · Contractors",
+          "message": "Some of us won't come in Monday if we're not paid.",
+          "alert": "Two of them are on your own incident team."
+        },
+        {
+          "type": "chain",
+          "kicker": "Who you depend on",
           "nodes": [
-            { "title": "You", "sub": "Your incident team", "tone": "plain" },
-            { "title": "The agency", "sub": "Passed assurance", "tone": "good" },
-            { "title": "Payroll provider", "sub": "Nobody looked", "tone": "bad" }
+            {
+              "title": "You",
+              "sub": "Your incident team",
+              "tone": "plain"
+            },
+            {
+              "title": "The agency",
+              "sub": "Passed assurance",
+              "tone": "good"
+            },
+            {
+              "title": "Payroll provider",
+              "sub": "Nobody looked",
+              "tone": "bad"
+            }
           ]
         },
-        { "type": "thread", "thread": "t2" }
+        {
+          "type": "thread",
+          "thread": "t2"
+        }
       ],
       "button": "Decide your next move →"
     },
-
     {
       "id": "d2",
       "type": "choice",
-      "header": { "label": "The Monday After", "step": "4 of 5", "progress": 80, "dots": true },
+      "header": {
+        "label": "The Monday After",
+        "step": "4 of 5",
+        "progress": 80,
+        "dots": true
+      },
       "title": "Your adjustment.",
       "intro": "Pick one.",
       "min": 1,
       "max": 1,
       "keyStyle": "number",
-      "notes": [{ "when": { "picked": "d1:A" }, "text": "Because you built the list, bridging is possible." }],
-      "threadsBeforeOptions": [{ "thread": "t4" }],
+      "notes": [
+        {
+          "when": {
+            "picked": "d1:A"
+          },
+          "text": "Because you built the list, bridging is possible."
+        }
+      ],
+      "threadsBeforeOptions": [
+        {
+          "thread": "t4"
+        }
+      ],
       "options": [
-        { "id": "1", "key": "1", "title": "Bridge the most exposed.", "short": "Bridge the most exposed", "body": "Arrange emergency payments for the workers who depend on this pay." },
-        { "id": "2", "key": "2", "title": "Tell the workers the truth.", "short": "Tell the workers the truth", "body": "Say what you know and what you don't, before the group chat does it for you." },
-        { "id": "3", "key": "3", "title": "Escalate for a policy call.", "short": "Escalate for a policy call", "body": "Ask the CEO whether to pay workers directly, suspend the agency, or hold." },
-        { "id": "4", "key": "4", "title": "Find out what else is at risk.", "short": "Find out what else is at risk", "body": "Who else does this provider serve, and what can its people get to on your side?" },
-        { "id": "5", "key": "5", "title": "Plan Monday without them.", "short": "Plan Monday without them", "body": "Rota, priorities, what you'll stop doing." }
+        {
+          "id": "1",
+          "key": "1",
+          "title": "Bridge the most exposed.",
+          "short": "Bridge the most exposed",
+          "body": "Arrange emergency payments for the workers who depend on this pay."
+        },
+        {
+          "id": "2",
+          "key": "2",
+          "title": "Tell the workers the truth.",
+          "short": "Tell the workers the truth",
+          "body": "Say what you know and what you don't, before the group chat does it for you."
+        },
+        {
+          "id": "3",
+          "key": "3",
+          "title": "Escalate for a policy call.",
+          "short": "Escalate for a policy call",
+          "body": "Ask the CEO whether to pay workers directly, suspend the agency, or hold."
+        },
+        {
+          "id": "4",
+          "key": "4",
+          "title": "Find out what else is at risk.",
+          "short": "Find out what else is at risk",
+          "body": "Who else does this provider serve, and what can its people get to on your side?"
+        },
+        {
+          "id": "5",
+          "key": "5",
+          "title": "Plan Monday without them.",
+          "short": "Plan Monday without them",
+          "body": "Rota, priorities, what you'll stop doing."
+        }
       ],
       "button": "Lock in"
     },
-
     {
       "id": "recorder",
       "type": "recorder",
-      "header": { "label": "The Monday After · Flight recorder", "step": "4 of 5" },
+      "header": {
+        "label": "The Monday After · Flight recorder",
+        "step": "4 of 5"
+      },
       "title": "Before you see how it landed.",
       "intro": "If this happened in your organisation, what would you actually do? Write it as you’d say it to your team. When the next incident hits, you can compare.",
       "fields": [
-        { "id": "hour", "label": "First hour · Required", "required": true },
-        { "id": "day", "label": "First day · Optional" },
-        { "id": "week", "label": "First week · Optional" }
+        {
+          "id": "hour",
+          "label": "First hour · Required",
+          "required": true
+        },
+        {
+          "id": "day",
+          "label": "First day · Optional"
+        },
+        {
+          "id": "week",
+          "label": "First week · Optional"
+        }
       ],
       "privacy": "No names or confidential detail. Write it as a pattern. Private to you: encrypted, and the author can’t read it. Timestamped, saved before the ledger.",
       "button": "Save and continue",
       "skip": "Skip, show me the result"
     },
-
     {
       "id": "forecast",
       "type": "forecast",
-      "header": { "label": "Incident File 01 · The Monday After", "step": "4 of 5", "progress": 90 },
-      "route": { "kicker": "Your route", "lines": [{ "choices": ["d1"] }, { "prefix": "Then: ", "choices": ["d2"], "strong": true }] },
+      "header": {
+        "label": "Incident File 01 · The Monday After",
+        "step": "4 of 5",
+        "progress": 90
+      },
+      "route": {
+        "kicker": "Your route",
+        "lines": [
+          {
+            "choices": [
+              "d1"
+            ]
+          },
+          {
+            "prefix": "Then: ",
+            "choices": [
+              "d2"
+            ],
+            "strong": true
+          }
+        ]
+      },
       "title": "A quick forecast.",
       "intro": "Three months from now, how does your organisation look compared with Friday? One tap. You'll compare it with what the Monday After shows.",
       "options": [
-        { "id": "stronger", "title": "Stronger than before", "phrase": "stronger than before." },
-        { "id": "same", "title": "About the same", "phrase": "about the same." },
-        { "id": "weaker", "title": "Weaker, in ways I can't see yet", "phrase": "weaker, in ways you can't see yet." }
+        {
+          "id": "stronger",
+          "title": "Stronger than before",
+          "phrase": "stronger than before."
+        },
+        {
+          "id": "same",
+          "title": "About the same",
+          "phrase": "about the same."
+        },
+        {
+          "id": "weaker",
+          "title": "Weaker, in ways I can't see yet",
+          "phrase": "weaker, in ways you can't see yet."
+        }
       ],
       "button": "Show me the Monday After →",
       "privacy": "Only you and the author see your forecast."
     },
-
     {
       "id": "ledger",
       "type": "ledger",
-      "header": { "label": "The Monday After", "step": "5 of 5", "progress": 100 },
+      "header": {
+        "label": "The Monday After",
+        "step": "5 of 5",
+        "progress": 100
+      },
       "headline": "Your assurance covered the agency. It never covered who pays the agency's workers.",
-      "summary": { "forecastLabel": "You forecast:", "tally": "So far: built up in {deposits}, drawn down in {drains}." },
+      "summary": {
+        "forecastLabel": "You forecast:",
+        "tally": "So far: built up in {deposits}, drawn down in {drains}."
+      },
       "rows": [
         {
-          "id": "dependency", "dimension": "Dependency", "effect": "drain",
-          "summary": "Part of your own incident team is paid through the same chain.",
-          "detail": {
-            "intro": "How much you lean on contractors and suppliers, and how many layers deep.",
-            "monday": "Part of your own incident team turns out to be paid through the same chain as the workers who might walk.",
-            "threeMonths": "Nobody has mapped what else those contractors can reach, and the same agency still supplies them.",
-            "nextTime": "The next failure arrives through the same door.",
-            "paper": "Assurance covered the agency. It never covered who pays the agency's workers."
+          "id": "dependency",
+          "dimension": "Dependency",
+          "takeBack": {
+            "label": "Map who is paid through the same chain as your incident team.",
+            "from": "Dependency"
           },
-          "takeBack": { "label": "Map who is paid through the same chain as your incident team.", "from": "Dependency" }
+          "variants": [
+            {
+              "when": {
+                "picked": "d2:4"
+              },
+              "effect": "deposit",
+              "summary": {
+                "todo": "Dependency, Deposit version (you found out what else is at risk): one-line summary"
+              },
+              "detail": {
+                "todo": "Dependency, Deposit version: detail page"
+              }
+            },
+            {
+              "effect": "drain",
+              "summary": "Part of your own incident team is paid through the same chain.",
+              "detail": {
+                "intro": "How much you lean on contractors and suppliers, and how many layers deep.",
+                "monday": "Part of your own incident team turns out to be paid through the same chain as the workers who might walk.",
+                "threeMonths": "Nobody has mapped what else those contractors can reach, and the same agency still supplies them.",
+                "nextTime": "The next failure arrives through the same door.",
+                "paper": "Assurance covered the agency. It never covered who pays the agency's workers."
+              }
+            }
+          ]
         },
         {
-          "id": "spof", "dimension": "Single point of failure", "effect": "drain",
+          "id": "spof",
+          "dimension": "Single point of failure",
+          "effect": "drain",
           "summary": "The agency was your only route to these workers. The payroll provider was theirs.",
-          "detail": { "todo": "Ledger detail for Single point of failure" }
+          "detail": {
+            "intro": "Where one failure stops everything, and how many layers down it sits.",
+            "monday": "Your only route to these workers was one agency. Its only route to pay them was one provider. Both failed together.",
+            "threeMonths": "The agency has promised a second payroll provider. Nobody has asked whether your other suppliers rely on the same one.",
+            "nextTime": "The next single point of failure is one you have not found yet, in a supplier nobody has asked you about.",
+            "paper": "Your supplier register lists the agency. It does not show the payroll provider behind it, or what else that provider carries for you."
+          },
+          "takeBack": {
+            "label": "Pick one supplier and ask who its single point of failure is.",
+            "from": "Single point of failure"
+          }
         },
         {
-          "id": "energy", "dimension": "Energy", "effect": "drain",
-          "summary": "Three people carried the weekend, and now they're the only ones who know how it worked.",
-          "detail": { "todo": "Ledger detail for Energy" }
+          "id": "energy",
+          "dimension": "Energy",
+          "variants": [
+            {
+              "when": {
+                "any": [
+                  {
+                    "picked": "d1:C"
+                  },
+                  {
+                    "picked": "d1:F"
+                  },
+                  {
+                    "picked": "holding:B3"
+                  },
+                  {
+                    "picked": "d2:1"
+                  }
+                ]
+              },
+              "effect": "drain",
+              "summary": "Three people carried the weekend, and now they're the only ones who know how it worked.",
+              "detail": {
+                "intro": "How much the people who carried the response have left, and who else can do what they did.",
+                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could.",
+                "threeMonths": "The same three are called first for every incident. The work they put aside has not been picked up.",
+                "nextTime": "The next incident starts with the same three people, already tired.",
+                "paper": "The incident plan names a team. It does not say who steps in when the same three are worn out."
+              }
+            },
+            {
+              "when": {
+                "any": [
+                  {
+                    "picked": "holding:B1"
+                  },
+                  {
+                    "picked": "d2:5"
+                  }
+                ]
+              },
+              "effect": "deposit",
+              "summary": {
+                "todo": "Energy, Deposit version (HR led, or you planned Monday without them): one-line summary"
+              },
+              "detail": {
+                "todo": "Energy, Deposit version: detail page"
+              }
+            },
+            {
+              "effect": "drain",
+              "summary": "Three people carried the weekend, and now they're the only ones who know how it worked.",
+              "detail": {
+                "intro": "How much the people who carried the response have left, and who else can do what they did.",
+                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could.",
+                "threeMonths": "The same three are called first for every incident. The work they put aside has not been picked up.",
+                "nextTime": "The next incident starts with the same three people, already tired.",
+                "paper": "The incident plan names a team. It does not say who steps in when the same three are worn out."
+              }
+            }
+          ],
+          "takeBack": {
+            "label": "Name the three people who carry every incident, and one person who could cover each.",
+            "from": "Energy"
+          }
         },
         {
-          "id": "trust", "dimension": "Trust", "effect": "deposit",
-          "when": { "picked": "d2:1" },
-          "summary": "Finance and HR paid people together for the first time.",
-          "detail": { "todo": "Ledger detail for Trust" }
+          "id": "trust",
+          "dimension": "Trust",
+          "variants": [
+            {
+              "when": {
+                "all": [
+                  {
+                    "picked": "holding:B3"
+                  },
+                  {
+                    "not": {
+                      "picked": "d1:D"
+                    }
+                  },
+                  {
+                    "not": {
+                      "picked": "d1:E"
+                    }
+                  }
+                ]
+              },
+              "effect": "drain",
+              "summary": {
+                "todo": "Trust, Drain version (you took over from HR): one-line summary"
+              },
+              "detail": {
+                "todo": "Trust, Drain version: detail page"
+              }
+            },
+            {
+              "when": {
+                "any": [
+                  {
+                    "picked": "d1:C"
+                  },
+                  {
+                    "picked": "d1:D"
+                  },
+                  {
+                    "picked": "d1:E"
+                  },
+                  {
+                    "picked": "holding:B1"
+                  },
+                  {
+                    "picked": "holding:B2"
+                  },
+                  {
+                    "picked": "d2:2"
+                  }
+                ]
+              },
+              "effect": "deposit",
+              "summary": "Finance and HR paid people together for the first time.",
+              "detail": {
+                "intro": "How far people will rely on each other when it is not clear who is in charge.",
+                "monday": "Finance and HR paid people together for the first time, and each saw the other work under pressure.",
+                "threeMonths": "People know who to ring in the other team, and they have started ringing before it is urgent.",
+                "nextTime": "The next incident starts with relationships that already work. That only holds while the same people are in post.",
+                "paper": "The escalation route exists in a document. Whether anyone uses it depends on whether they have worked with the person at the other end."
+              }
+            }
+          ],
+          "takeBack": {
+            "label": "Book thirty minutes with your counterpart in Finance or HR before you need them.",
+            "from": "Trust"
+          }
         },
         {
-          "id": "visibility", "dimension": "Visibility", "effect": "deposit",
-          "when": { "picked": "d1:A" },
-          "summary": "You have a list of these workers that nobody had on Friday.",
-          "detail": { "todo": "Ledger detail for Visibility" }
+          "id": "visibility",
+          "dimension": "Visibility",
+          "variants": [
+            {
+              "when": {
+                "any": [
+                  {
+                    "picked": "d1:A"
+                  },
+                  {
+                    "picked": "d2:4"
+                  }
+                ]
+              },
+              "effect": "deposit",
+              "summary": "You have a list of these workers that nobody had on Friday.",
+              "detail": {
+                "intro": "How much of the organisation you can see, and how quickly.",
+                "monday": "You have a list of these workers that nobody had on Friday.",
+                "threeMonths": "The list is already out of date unless someone owns it. Contractors have started and left since.",
+                "nextTime": "You start from a list, not a guess, if you keep it.",
+                "paper": "The contract register is complete. It lists the agency. It does not list the people the agency provides."
+              }
+            },
+            {
+              "effect": "drain",
+              "summary": {
+                "todo": "Visibility, Drain version (no list was built): one-line summary"
+              },
+              "detail": {
+                "todo": "Visibility, Drain version: detail page"
+              }
+            }
+          ],
+          "takeBack": {
+            "label": "Find out whether one list of contractors exists, and who owns it.",
+            "from": "Visibility"
+          }
         },
         {
-          "id": "decision-rights", "dimension": "Decision rights", "effect": { "todo": "Drain or deposit?" },
-          "when": { "any": [{ "pulled": "t1" }, { "pulled": "t2" }] },
-          "summary": { "todo": "Ledger row for Decision rights (added by threads)" },
-          "detail": { "todo": "Ledger detail for Decision rights" }
+          "id": "decision-rights",
+          "dimension": "Decision rights",
+          "when": {
+            "any": [
+              {
+                "pulled": "t1"
+              },
+              {
+                "pulled": "t2"
+              },
+              {
+                "picked": "d2:3"
+              }
+            ]
+          },
+          "variants": [
+            {
+              "when": {
+                "any": [
+                  {
+                    "picked": "t1:back"
+                  },
+                  {
+                    "picked": "t2:shared"
+                  }
+                ]
+              },
+              "effect": "deposit",
+              "summary": "You and HR settled who decides before the CEO had to ask.",
+              "detail": {
+                "intro": "Who is allowed to make which call, and whether everyone knows it.",
+                "monday": "The CEO asked who was leading and got one answer.",
+                "threeMonths": "The agreement was spoken, not written. People remember it differently, and the next contract will be signed without it.",
+                "nextTime": "The same question is answered in minutes, if the answer is written down.",
+                "paper": "The delegation scheme says who can sign off payments. It does not say who can decide to pay people outside the usual chain."
+              }
+            },
+            {
+              "effect": "drain",
+              "summary": "The CEO asked who was leading and heard two answers.",
+              "detail": {
+                "todo": "Decision rights, Drain version: detail page"
+              }
+            }
+          ],
+          "takeBack": {
+            "label": "Write down who decides whether to pay workers outside the usual chain, and check they know it.",
+            "from": "Decision rights"
+          }
         },
         {
-          "id": "delivery", "dimension": "Delivery", "effect": { "todo": "Drain or deposit?" },
-          "when": { "pulled": "t4" },
-          "summary": { "todo": "Ledger row for Delivery (added by threads)" },
-          "detail": { "todo": "Ledger detail for Delivery" }
+          "id": "delivery",
+          "dimension": "Delivery",
+          "when": {
+            "any": [
+              {
+                "pulled": "t3"
+              },
+              {
+                "pulled": "t4"
+              },
+              {
+                "picked": "d1:F"
+              },
+              {
+                "picked": "d2:5"
+              }
+            ]
+          },
+          "variants": [
+            {
+              "when": {
+                "all": [
+                  {
+                    "picked": "d1:F"
+                  },
+                  {
+                    "picked": "d2:5"
+                  }
+                ]
+              },
+              "effect": "deposit",
+              "summary": "You decided what stopped first, so the rest of the work slowed on purpose.",
+              "detail": {
+                "todo": "Delivery, Deposit version: detail page"
+              }
+            },
+            {
+              "effect": "drain",
+              "summary": "Planned work stopped while you looked after this, and nobody counted what.",
+              "detail": {
+                "intro": "What the rest of the organisation did not get done because of the response.",
+                "monday": "Three people left planned work to cover the weekend. Their projects waited, quietly.",
+                "threeMonths": "Two pieces of work have slipped. The reasons are not on any report.",
+                "nextTime": "The same work stops first again, because nobody agreed in advance what should.",
+                "paper": "The portfolio report is green. It does not know about the weekend."
+              }
+            }
+          ],
+          "takeBack": {
+            "label": "List the work you would stop first in an incident, and tell the people it affects.",
+            "from": "Delivery"
+          }
         }
       ],
       "footnote": "Tap a row for three months on and next time. Flag what you’d take back.",
       "button": "Choose what to take back →"
     },
-
     {
       "id": "takeback",
       "type": "takeback",
-      "header": { "label": "The Monday After · Your move", "step": "5 of 5", "progress": 100 },
+      "header": {
+        "label": "The Monday After · Your move",
+        "step": "5 of 5",
+        "progress": 100
+      },
       "title": "Take one thing back.",
       "intro": "You flagged {count}. Pick the one you’ll actually do. One is enough.",
       "none": "You didn’t flag anything this time. You can go back to the ledger and flag something, or close the file.",
       "whenKicker": "By when",
       "whenOptions": [
-        { "id": "1w", "label": "1 week", "phrase": "By one week from today." },
-        { "id": "2w", "label": "2 weeks", "phrase": "By two weeks from today." },
-        { "id": "1m", "label": "1 month", "phrase": "By one month from today." }
+        {
+          "id": "1w",
+          "label": "1 week",
+          "phrase": "By one week from today."
+        },
+        {
+          "id": "2w",
+          "label": "2 weeks",
+          "phrase": "By two weeks from today."
+        },
+        {
+          "id": "1m",
+          "label": "1 month",
+          "phrase": "By one month from today."
+        }
       ],
       "defaultWhen": "2w",
       "followUp": "Ask me in 30 days whether I did it. One email, and you can stop it any time.",
@@ -279,16 +847,67 @@
       "button": "Save and close the file →",
       "skip": "Skip, close the file"
     },
-
     {
       "id": "closing",
       "type": "closing",
-      "header": { "label": "Incident File 01 · The Monday After", "step": "Closed", "progress": 100, "tone": "teal" },
+      "header": {
+        "label": "Incident File 01 · The Monday After",
+        "step": "Closed",
+        "progress": 100,
+        "tone": "teal"
+      },
       "kicker": "Your Monday After",
-      "mirror": [
-        { "when": { "all": [{ "picked": "d1:A" }, { "picked": "d2:1" }] }, "text": "You built the list and bridged the gap. You now know who these people are. You still don't know who owns the supplier's supplier." },
-        { "text": { "todo": "Closing line for this route" } }
-      ],
+      "mirror": {
+        "opening": {
+          "choice": "d1",
+          "prefix": "You ",
+          "phrases": {
+            "A": "built the list",
+            "B": "pressed the agency",
+            "C": "bridged the gap",
+            "D": "told the workers early",
+            "E": "went to worker representatives early",
+            "F": "protected the critical work"
+          }
+        },
+        "middle": [
+          {
+            "when": {
+              "picked": "d1:A"
+            },
+            "text": "You now know who these people are."
+          },
+          {
+            "text": "You still don't have one list of these people."
+          }
+        ],
+        "ending": {
+          "choice": "d2",
+          "parts": {
+            "1": {
+              "did": "You kept the most exposed people paid.",
+              "still": "You still don't know who owns the supplier's supplier."
+            },
+            "2": {
+              "did": "You said what you knew and what you didn't, before the group chat did.",
+              "still": "You still can't say when anyone will be paid, or who owns the supplier's supplier."
+            },
+            "3": {
+              "did": "You made it the CEO's decision, so it had an owner by Saturday.",
+              "still": "You still haven't asked who should have owned the supplier's supplier before it mattered."
+            },
+            "4": {
+              "did": "You know what else this provider touches.",
+              "still": "You still haven't decided who watches it."
+            },
+            "5": {
+              "did": "You protected Monday.",
+              "still": "You still don't know who will be paid, or who owns the supplier's supplier."
+            }
+          }
+        },
+        "fallback": "You still don't know who owns the supplier's supplier."
+      },
       "tagline": "Lucky, or designed? Only one of those repeats.",
       "takingKicker": "You’re taking this back",
       "recorder": {
@@ -297,92 +916,243 @@
         "button": "Email me my flight recorder",
         "previewNote": "In the finished version, this emails you a copy."
       },
-      "share": { "kicker": "Pass it on", "text": "Send this to the person you'd most like to answer it differently.", "button": "Share this file", "copied": "Link copied." },
-      "team": { "text": "Some of these questions are hard to settle alone. If you'd like to run this with your team, reply to this email and I'll show you how.", "button": "Reply “team”" },
+      "share": {
+        "kicker": "Pass it on",
+        "text": "Send this to the person you'd most like to answer it differently.",
+        "button": "Share this file",
+        "copied": "Link copied."
+      },
+      "team": {
+        "text": "Some of these questions are hard to settle alone. If you'd like to run this with your team, reply to this email and I'll show you how.",
+        "button": "Reply “team”"
+      },
       "next": "Incident File 02 arrives next month."
     }
   ],
-
   "threads": {
     "t1": {
-      "header": { "label": "The Monday After · Thread", "step": "T1" },
-      "chip": { "kicker": "Pull a thread · 1 min", "title": "Are you owning this?" },
+      "header": {
+        "label": "The Monday After · Thread",
+        "step": "T1"
+      },
+      "chip": {
+        "kicker": "Pull a thread · 1 min",
+        "title": "Are you owning this?"
+      },
       "title": "Are you owning this?",
       "intro": [
-        { "when": { "picked": "holding:B2" }, "text": "You stepped in alongside HR. The CEO has asked who is leading." },
-        { "text": { "todo": "Thread intro for B1 or B3" } }
+        {
+          "when": {
+            "picked": "holding:B2"
+          },
+          "text": "You stepped in alongside HR. The CEO has asked who is leading."
+        },
+        {
+          "when": {
+            "picked": "holding:B1"
+          },
+          "text": "You agreed HR would lead. The CEO has asked who they should call."
+        },
+        {
+          "when": {
+            "picked": "holding:B3"
+          },
+          "text": "You took it from HR. The CEO has asked who is leading, and so has HR."
+        }
       ],
       "options": [
-        { "id": "front", "title": "Front it", "body": "You are the visible lead, to the CEO and to the workers.", "reveal": { "todo": "Assumption, gain and cost for ‘Front it’" } },
         {
-          "id": "back", "title": "Back HR, visibly", "body": "You tell the CEO you are supporting the Chief People Officer.",
+          "id": "front",
+          "title": "Front it",
+          "body": "You are the visible lead, to the CEO and to the workers.",
+          "reveal": {
+            "assuming": "You can carry the workers' trust and the CEO's confidence at once, and HR will not read it as a takeover.",
+            "gain": "One clear voice. The CEO and the workers know who to call.",
+            "cost": "HR's ownership weakens, and your name is on it if it goes wrong."
+          }
+        },
+        {
+          "id": "back",
+          "title": "Back HR, visibly",
+          "body": "You tell the CEO you are supporting the Chief People Officer.",
           "reveal": {
             "assuming": "HR can hold the room with the CEO and the workers, and you will hear in time if it slips.",
             "gain": "The owner of the relationship stays accountable, and your capacity is kept for the rest of IT.",
             "cost": "Your influence rests on someone else’s performance, and you may hear late."
           }
         },
-        { "id": "background", "title": "Stay in the background", "body": "You help quietly and step forward only if asked.", "reveal": { "todo": "Assumption, gain and cost for ‘Stay in the background’" } }
+        {
+          "id": "background",
+          "title": "Stay in the background",
+          "body": "You help quietly and step forward only if asked.",
+          "reveal": {
+            "assuming": "You will be asked in time, and HR will tell you when it starts to slip.",
+            "gain": "Your capacity stays free for the rest of IT, and HR keeps ownership of its own relationship.",
+            "cost": "You hear late, and the delay is invisible until it is not."
+          }
+        }
       ],
       "closing": "All three can be reasonable. The question is who the CEO believes owns it."
     },
     "t2": {
-      "header": { "label": "The Monday After · Thread", "step": "Optional" },
-      "chip": { "kicker": "Pull a thread · 1 min", "title": "Who should have checked?" },
+      "header": {
+        "label": "The Monday After · Thread",
+        "step": "Optional"
+      },
+      "chip": {
+        "kicker": "Pull a thread · 1 min",
+        "title": "Who should have checked?"
+      },
       "title": "Who should have checked?",
       "intro": "The agency passed assurance when you bought it. Nobody looked at who pays its workers.",
       "options": [
-        { "id": "it", "title": "IT", "body": "Knows the technology", "reveal": { "todo": "Assumption, gain and cost for ‘IT’" } },
         {
-          "id": "hr", "title": "HR", "body": "Owns the relationship",
+          "id": "it",
+          "title": "IT",
+          "body": "Knows the technology",
+          "reveal": {
+            "assuming": "IT knows what to look for in a payroll provider, and has the standing to ask for it.",
+            "gain": "The check is technically sound, and it covers systems IT already protects.",
+            "cost": "IT has to know the contract exists first. Here it never saw it, so the check never starts."
+          }
+        },
+        {
+          "id": "hr",
+          "title": "HR",
+          "body": "Owns the relationship",
           "reveal": {
             "assuming": "HR has, or can buy in, the skill to judge a payroll provider's resilience.",
             "gain": "The owner of the relationship stays accountable.",
             "cost": "The check is shallow, which risks being paper again."
           }
         },
-        { "id": "agency", "title": "The agency", "body": "It's their supply chain", "reveal": { "todo": "Assumption, gain and cost for ‘The agency’" } },
-        { "id": "shared", "title": "Shared, by design", "body": "Agreed in advance, revisited as the supplier's role changes", "reveal": { "todo": "Assumption, gain and cost for ‘Shared, by design’" } }
+        {
+          "id": "agency",
+          "title": "The agency",
+          "body": "It's their supply chain",
+          "reveal": {
+            "assuming": "The agency is checking its own supplier, and will tell you honestly if it is not.",
+            "gain": "The responsibility sits with the party closest to the supplier, and asking costs you nothing.",
+            "cost": "You are relying on a statement, not evidence, from someone who loses the contract if the answer is bad."
+          }
+        },
+        {
+          "id": "shared",
+          "title": "Shared, by design",
+          "body": "Agreed in advance, revisited as the supplier's role changes",
+          "reveal": {
+            "assuming": "Someone agreed in advance who checks what, and keeps that agreement alive as the supplier's role changes.",
+            "gain": "Nothing falls between IT and HR, and the check is revisited when the supplier changes.",
+            "cost": "It takes effort before anything has gone wrong, which is hard to justify, and agreements like this drift if nobody owns them."
+          }
+        }
       ],
       "closing": "All four can be reasonable. The question is whether anyone decided this agency was critical.",
       "disclaimer": "A question about what a sensible owner would check, not what the law requires.",
-      "takeBack": { "label": "Ask who should have checked the agency’s payroll provider.", "commit": "Ask who should have checked the agency’s payroll provider, and write down the answer.", "from": "Who should have checked?" }
+      "takeBack": {
+        "label": "Ask who should have checked the agency’s payroll provider.",
+        "commit": "Ask who should have checked the agency’s payroll provider, and write down the answer.",
+        "from": "Who should have checked?"
+      }
     },
     "t3": {
-      "header": { "label": "The Monday After · Thread", "step": "T3" },
-      "chip": { "kicker": "Pull a thread · 1 min", "title": "The clock", "sub": "Does anyone’s clock start now?" },
+      "header": {
+        "label": "The Monday After · Thread",
+        "step": "T3"
+      },
+      "chip": {
+        "kicker": "Pull a thread · 1 min",
+        "title": "The clock",
+        "sub": "Does anyone’s clock start now?"
+      },
       "title": "The clock.",
-      "situation": { "time": "Saturday, 09:10", "text": "The agency’s payroll provider “cannot rule out” a security incident. Pay data is personal data. What do you do about the clock?" },
+      "situation": {
+        "time": "Saturday, 09:10",
+        "text": "The agency’s payroll provider “cannot rule out” a security incident. Pay data is personal data. What do you do about the clock?"
+      },
       "options": [
-        { "id": "wait", "title": "Wait for confirmation", "body": "Nothing to act on until someone says it is an incident.", "reveal": { "todo": "Assumption, gain and cost for ‘Wait for confirmation’" } },
         {
-          "id": "note", "title": "Note when you were told", "body": "Start a timestamped log of what you knew and when.",
+          "id": "wait",
+          "title": "Wait for confirmation",
+          "body": "Nothing to act on until someone says it is an incident.",
+          "reveal": {
+            "assuming": "Nothing starts until someone confirms an incident, and nobody will later ask what you knew on Saturday.",
+            "gain": "You do not raise an alarm over a maybe.",
+            "cost": "If the clock runs from when you became aware, time has already passed, and you have no record of what you knew."
+          }
+        },
+        {
+          "id": "note",
+          "title": "Note when you were told",
+          "body": "Start a timestamped log of what you knew and when.",
           "reveal": {
             "assuming": "The record you start now will matter later, and someone else is deciding who reports.",
             "gain": "You can show what you knew and when.",
             "cost": "A log is not a decision. Someone still has to own the call."
           }
         },
-        { "id": "dpo", "title": "Ask your data protection lead", "body": "Are you a controller or a processor here, and who tells the regulator?", "reveal": { "todo": "Assumption, gain and cost for ‘Ask your data protection lead’" } },
-        { "id": "writing", "title": "Ask the agency in writing", "body": "Has it told its customers, and has its provider told it?", "reveal": { "todo": "Assumption, gain and cost for ‘Ask the agency in writing’" } }
+        {
+          "id": "dpo",
+          "title": "Ask your data protection lead",
+          "body": "Are you a controller or a processor here, and who tells the regulator?",
+          "reveal": {
+            "assuming": "You have a data protection lead, they can be reached on a Saturday, and they can say what your role is.",
+            "gain": "You get a view early on whether you are a controller or a processor here, and who has to tell whom.",
+            "cost": "If nobody can be reached, hours pass. And the honest answer may be \"it depends\"."
+          }
+        },
+        {
+          "id": "writing",
+          "title": "Ask the agency in writing",
+          "body": "Has it told its customers, and has its provider told it?",
+          "reveal": {
+            "assuming": "The agency knows what its provider has told it, and will answer in writing.",
+            "gain": "You have a dated record of what you asked and what you were told.",
+            "cost": "A written question can slow things down and make the agency defensive. It may not have the answer either."
+          }
+        }
       ],
       "closing": "The clock may start when you become aware, not when someone confirms.",
       "disclaimer": "Questions to check with your data protection lead or counsel. Not legal advice."
     },
     "t4": {
-      "header": { "label": "The Monday After · Thread", "step": "Optional" },
-      "chip": { "kicker": "Saturday, 14:00 · Pull a thread", "title": "A neighbour will pay its contractors directly", "sub": "Your workers have seen it." },
+      "header": {
+        "label": "The Monday After · Thread",
+        "step": "Optional"
+      },
+      "chip": {
+        "kicker": "Saturday, 14:00 · Pull a thread",
+        "title": "A neighbour will pay its contractors directly",
+        "sub": "Your workers have seen it."
+      },
       "time": "Saturday, 14:00",
       "title": "You're not the only customer.",
-      "situation": { "text": "A neighbouring organisation that uses the same agency announces it will pay its contractors directly. Your workers have seen it." },
+      "situation": {
+        "text": "A neighbouring organisation that uses the same agency announces it will pay its contractors directly. Your workers have seen it."
+      },
       "prompt": "What do you do? Pick one.",
       "lock": true,
       "options": [
-        { "id": "coordinate", "title": "Call the other customers and agree a common line" },
-        { "id": "wait", "title": "Wait and let them move first" },
-        { "id": "pay", "title": "Pay directly too, now" },
-        { "id": "hold", "title": "Hold your line and explain why" },
-        { "id": "forum", "title": "Take it to a shared forum or the agency" }
+        {
+          "id": "coordinate",
+          "title": "Call the other customers and agree a common line"
+        },
+        {
+          "id": "wait",
+          "title": "Wait and let them move first"
+        },
+        {
+          "id": "pay",
+          "title": "Pay directly too, now"
+        },
+        {
+          "id": "hold",
+          "title": "Hold your line and explain why"
+        },
+        {
+          "id": "forum",
+          "title": "Take it to a shared forum or the agency"
+        }
       ],
       "disclaimer": "Coordinating with other customers may have limits depending on sector and country. Check before you act."
     }
