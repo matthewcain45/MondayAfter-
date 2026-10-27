@@ -19,6 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Check this is the main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run this button from the main branch: choose main under 'Use workflow from'. AWS only accepts the main branch."
+          exit 1
+
       - name: Sign in to AWS (short-lived)
         uses: aws-actions/configure-aws-credentials@v6
         with:

@@ -30,6 +30,7 @@ describe("30-day follow-up", () => {
     assert.match(mail.subject, /Did you do it\? Incident File 01/);
     assert.match(mail.text, /followup\.html#t=/);
     assert.match(mail.text, /manage\.html#t=/, "every email has the pause, unsubscribe and delete link");
+    assert.match(mail.oneClickUnsubscribeUrl!, /\/api\/unsubscribe\/one-click\//);
     assert.deepEqual(await env.api.sendFollowUps({ asOf: in31Days }), { sent: 0, failed: 0 }, "never sent twice");
   });
 

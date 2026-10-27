@@ -2,7 +2,7 @@
 // "X-TMA-Link" header, never in the web address, so they don't end up in logs.
 
 import { noAudit, type Audit } from "./audit.ts";
-import { ApiError, type Service } from "./service.ts";
+import { ApiError, ONE_CLICK_PATH, type Service } from "./service.ts";
 
 export interface Request {
   method: string;
@@ -20,7 +20,8 @@ export interface Response {
 
 type Handler = (svc: Service, token: string | undefined, body: unknown, req: Request) => Promise<unknown>;
 
-export const ROUTES: Record<string, { method: string; path: string; run: Handler }> = {
+// `tokenInPath`: the one route whose link is in the address (see oneClickUnsubscribe).
+export const ROUTES: Record<string, { method: string; path: string; run: Handler; tokenInPath?: true }> = {
   signup: { method: "POST", path: "/api/signup", run: (svc, _t, b, req) => svc.signup({ ...(b as object), ip: req.ip }) },
   confirm: { method: "POST", path: "/api/confirm", run: (svc, t) => svc.confirm(t) },
   openFile: { method: "GET", path: "/api/file", run: (svc, t) => svc.openFile(t) },
@@ -34,6 +35,8 @@ export const ROUTES: Record<string, { method: string; path: string; run: Handler
   unsubscribe: { method: "POST", path: "/api/unsubscribe", run: (svc, t) => svc.unsubscribe(t) },
   deleteMe: { method: "POST", path: "/api/delete", run: (svc, t) => svc.deleteMe(t) },
   followUpStatus: { method: "POST", path: "/api/followup", run: (svc, t) => svc.followUpStatus(t) },
+  // Mail apps POST "List-Unsubscribe=One-Click" here, as a form rather than JSON.
+  oneClickUnsubscribe: { method: "POST", path: ONE_CLICK_PATH, tokenInPath: true, run: (svc, t) => svc.oneClickUnsubscribe(t) },
   answerFollowUp: { method: "POST", path: "/api/followup/answer", run: (svc, t, b) => svc.answerFollowUp(t, b) },
 };
 
@@ -53,12 +56,13 @@ export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTE
   const routes = allowed.map((name) => ROUTES[name]);
 
   return async function handle(req: Request): Promise<Response> {
-    const route = routes.find((r) => r.path === req.path);
+    const route = routes.find((r) => (r.tokenInPath ? req.path.startsWith(r.path) : r.path === req.path));
     if (!route) return reply(404, { error: "Not found" });
     if (route.method !== req.method) return reply(405, { error: "Method not allowed" });
+    const path = route.tokenInPath ? route.path + "…" : req.path; // never log a link
     try {
       let body: unknown = undefined;
-      if (req.body) {
+      if (req.body && !route.tokenInPath) {
         if (req.body.length > MAX_BODY) return reply(413, { error: "Too much data" });
         try {
           body = JSON.parse(req.body);
@@ -66,16 +70,16 @@ export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTE
           return reply(400, { error: "Couldn't read the request" });
         }
       }
-      const token = req.headers["x-tma-link"]?.trim() || undefined;
+      const token = route.tokenInPath ? req.path.slice(route.path.length) : req.headers["x-tma-link"]?.trim() || undefined;
       return reply(200, await route.run(svc, token, body, req));
     } catch (e) {
       if (e instanceof ApiError) {
         // The route and status only: the message can echo part of what was sent.
-        audit("request-refused", { method: req.method, path: req.path, status: e.status });
+        audit("request-refused", { method: req.method, path, status: e.status });
         return reply(e.status, { error: e.message });
       }
       // Log the route and error only: never request bodies, emails or tokens.
-      console.error("Request failed", req.method, req.path, e instanceof Error ? e.message : "unknown error");
+      console.error("Request failed", req.method, path, e instanceof Error ? e.message : "unknown error");
       return reply(500, { error: "Something went wrong. Please try again." });
     }
   };

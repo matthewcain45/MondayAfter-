@@ -137,3 +137,12 @@ Four findings, all accepted by the owner and fixed.
      - each Send and Export button press, with its GitHub run number
    - **Deliberately not added:** CloudFront, API Gateway and S3 access logs. They would record every visitor's internet address on every page, which is far more personal data than a 50-reader newsletter needs. AWS's own CloudTrail event history already keeps 90 days of account changes for free.
    - **Still open:** keeping logs and data if the system is ever removed is part of launch checklist item 4.
+
+## One-click unsubscribe (27 October 2026)
+
+Gmail and Yahoo expect a one-click "Unsubscribe" button for newsletters (RFC 8058). The button needs its link in the web address, which is the only exception to the rule that links travel in a header. The exception is kept narrow:
+
+- **Its own link, for this purpose only.** It's stored scrambled like every other link. It can't open a file, see the manage page, pause or delete. It lasts 2 years, like the manage link.
+- **Only a POST works.** Mail apps POST to it. Link-checking robots and anyone simply opening it send GET, which changes nothing.
+- **Kept out of the logs.** The security notes and error lines record the route without the link. CloudFront and API Gateway access logs are off, so nothing else records the address.
+- **The worst case if it leaks:** someone could unsubscribe that one reader, who can sign up again.

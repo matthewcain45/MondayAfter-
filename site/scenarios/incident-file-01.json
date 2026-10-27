@@ -656,7 +656,7 @@
               "summary": "Finance, HR and IT worked together successfully and value IT’s governance processes more highly. How can you use that to increase compliance across the organisation?",
               "detail": {
                 "intro": "How far people will rely on each other when it is not clear who is in charge.",
-                "monday": "Finance and HR paid people together for the first time, and each saw the other work under pressure.",
+                "monday": "Finance, HR and IT worked the problem together, and each saw the others work under pressure.",
                 "threeMonths": "People know who to ring in the other team, and they have started ringing before it is urgent.",
                 "nextTime": "The next incident starts with relationships that already work. That only holds while the same people are in post.",
                 "paper": "The escalation route exists in a document. Whether anyone uses it depends on whether they have worked with the person at the other end."
@@ -674,14 +674,7 @@
           "variants": [
             {
               "when": {
-                "any": [
-                  {
-                    "picked": "d1:A"
-                  },
-                  {
-                    "picked": "d2:4"
-                  }
-                ]
+                "picked": "d1:A"
               },
               "effect": "deposit",
               "summary": "You have a list of these workers that nobody had on Friday.",
@@ -735,11 +728,14 @@
                   },
                   {
                     "picked": "t2:shared"
+                  },
+                  {
+                    "picked": "t1:front"
                   }
                 ]
               },
               "effect": "deposit",
-              "summary": "You and HR settled who decides before the CEO had to ask.",
+              "summary": "The CEO asked who was leading and got one answer.",
               "detail": {
                 "intro": "Who is allowed to make which call, and whether everyone knows it.",
                 "monday": "The CEO asked who was leading and got one answer.",

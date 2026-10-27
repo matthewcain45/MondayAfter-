@@ -17,8 +17,8 @@ Parameters:
       created later with the same name can't pass as this one.
   AllowedBranch:
     Type: String
-    Default: claude/monday-after-claude-md-tnf5n3
-    Description: Only buttons run from this branch get access.
+    Default: main
+    Description: Only buttons run from this branch get access. Changes reach it only when the owner approves them.
 
 Resources:
   GitHubSignIn:

@@ -8,17 +8,15 @@
 
 Every detail page now has the four-part layout (Monday, Three months on, Next time, Assured on paper).
 
-## Choices made while putting the copy in, to confirm
+## Choices made while putting the copy in (settled 27 October 2026)
 
-1. **Energy when neither rule applies** (for example A + D, then "Tell the workers the truth"): shown as **Drain**, with the existing line. The original design showed Energy as Drain on every route.
-2. **Trust when neither rule applies** (for example A + F, then "Find out what else is at risk"): the row is **not shown**. The alternative would be a third Trust line.
-3. **Decision rights with "Front it":** counted as **Drain**, because the rule says Deposit only for "Back HR, visibly" or "Shared, by design". Fronting it is arguably a clear owner too.
-4. **Two existing one-liners now appear on more routes than they were written for:**
-   - Trust Deposit says "Finance and HR paid people together for the first time", including for D or E routes where nobody paid anyone.
-   - Visibility Deposit says "You have a list of these workers…", including for "Find out what else is at risk" without A.
-
-   You may want separate lines for those.
-5. **F's assumption** ("…which of them are on your incident team") was kept as written, so the Twist feels foreseeable to readers who chose F.
+1. **Energy when neither rule applies:** Drain, with the "three people carried the weekend" line. Kept.
+2. **Trust when neither rule applies:** the row isn't shown. Kept.
+3. **Decision rights with "Front it":** now a **Deposit**, like "Back HR, visibly" and "Shared, by design". The deposit summary now fits all three: "The CEO asked who was leading and got one answer."
+4. **Lines that appeared on routes they weren't written for:**
+   - Trust deposit's Monday line is now route-neutral: "Finance, HR and IT worked the problem together, and each saw the others work under pressure."
+   - Visibility deposit now shows only for "Build the list". "Find out what else is at risk" without the list gets the Visibility drain version (and still earns the Dependency deposit).
+5. **F's assumption** ("…which of them are on your incident team"): kept as written.
 
 ## Other points from the copy document
 

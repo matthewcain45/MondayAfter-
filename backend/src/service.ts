@@ -7,7 +7,7 @@ import { hashForLimit, hashToken, newId, newToken, seal, unseal } from "./crypto
 import { confirmEmail, fileEmail, followUpEmail, recorderEmail } from "./emails.ts";
 import { labels } from "./export.ts";
 import { scenarios, type Scenario } from "./scenarios.ts";
-import type { Clock, FollowUpAnswer, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
+import type { Clock, Email, FollowUpAnswer, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
 import { networkForLimits } from "./edge.ts";
 import { emailForLimits, InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
 
@@ -20,6 +20,7 @@ export class ApiError extends Error {
 }
 
 const EXPIRED = "This link has expired or isn't valid. Reply to any Monday After email and we'll send you a fresh one.";
+export const ONE_CLICK_PATH = "/api/unsubscribe/one-click/";
 const SLOW_DOWN = "Too many requests. Please wait a little and try again.";
 const BUSY = "We're getting a lot of sign-ups right now. Please try again in an hour.";
 
@@ -46,6 +47,14 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
   }
 
   const urlFor = (page: string, token: string) => `${settings.siteUrl}/${page}#t=${token}`;
+  // The one exception to "links never travel in a web address": mail apps need the link
+  // in the address for their one-click "Unsubscribe" button. This link can only
+  // unsubscribe, only by a POST (so link-checking robots can't trigger it), and is
+  // hidden from the security notes.
+  const oneClickUrl = async (subscriberId: string) =>
+    `${settings.siteUrl}${ONE_CLICK_PATH}${await issueLink("unsubscribe", subscriberId, LIMITS.manageLinkSeconds)}`;
+  const withOneClick = async (email: Email, subscriberId: string): Promise<Email> => ({ ...email, oneClickUnsubscribeUrl: await oneClickUrl(subscriberId) });
+
   const manageUrl = async (subscriberId: string) => urlFor("manage.html", await issueLink("manage", subscriberId, LIMITS.manageLinkSeconds));
 
   function limited(limit: string, subscriberId: string | undefined, message: string): never {
@@ -133,7 +142,7 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
       for (const r of readers) {
         try {
           const token = await issueLink("file", r.id, LIMITS.fileLinkSeconds, scenarioId);
-          await mailer.send(fileEmail(r.email, scenario.email, urlFor("index.html", token), await manageUrl(r.id)));
+          await mailer.send(await withOneClick(fileEmail(r.email, scenario.email, urlFor("index.html", token), await manageUrl(r.id)), r.id));
           await store.putEvent({ subscriberId: r.id, scenarioId, at: nowIso(), name: "sent", expiresAt: epoch(LIMITS.retentionSeconds) });
           sent++;
         } catch {
@@ -159,7 +168,7 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
         try {
           const token = await issueLink("followup", subscriber.id, LIMITS.followUpLinkSeconds, scenario.id);
           const action = labels(scenario).takeBack(tb.item);
-          await mailer.send(followUpEmail(subscriber.email, scenario.title, action, urlFor("followup.html", token), await manageUrl(subscriber.id)));
+          await mailer.send(await withOneClick(followUpEmail(subscriber.email, scenario.title, action, urlFor("followup.html", token), await manageUrl(subscriber.id)), subscriber.id));
           await store.putAnswers({ ...a, followUpSentAt: nowIso() });
           await store.putEvent({ subscriberId: subscriber.id, scenarioId: scenario.id, at: nowIso(), name: "followup-sent", expiresAt: epoch(LIMITS.retentionSeconds) });
           audit("followup-sent", { subscriberId: subscriber.id, scenarioId: scenario.id });
@@ -282,6 +291,14 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
       const { subscriber } = await resolve(token, "manage");
       await store.putSubscriber({ ...subscriber, pausedUntil: undefined });
       audit("resumed", { subscriberId: subscriber.id });
+      return { ok: true };
+    },
+
+    // A mail app's own "Unsubscribe" button (one click, no page).
+    async oneClickUnsubscribe(token: unknown): Promise<{ ok: true }> {
+      const { subscriber } = await resolve(token, "unsubscribe");
+      if (subscriber.status !== "unsubscribed") await store.putSubscriber({ ...subscriber, status: "unsubscribed", unsubscribedAt: nowIso() });
+      audit("unsubscribed", { subscriberId: subscriber.id, via: "one-click" });
       return { ok: true };
     },
 

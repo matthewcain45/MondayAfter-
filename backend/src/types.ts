@@ -15,7 +15,7 @@ export interface Subscriber {
   expiresAt: number; // epoch seconds; the database deletes the record after this
 }
 
-export type LinkPurpose = "confirm" | "file" | "manage" | "followup";
+export type LinkPurpose = "confirm" | "file" | "manage" | "followup" | "unsubscribe";
 
 export interface Link {
   tokenHash: string; // only a scrambled (hashed) version of the token is stored
@@ -111,6 +111,8 @@ export interface Email {
   to: string;
   subject: string;
   text: string;
+  // The address mail apps use for their own "Unsubscribe" button (one-click, RFC 8058).
+  oneClickUnsubscribeUrl?: string;
 }
 
 export interface Mailer {

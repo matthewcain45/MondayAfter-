@@ -128,7 +128,15 @@ export function sesMailer(from: string, replyTo: string, client = new SESv2Clien
         FromEmailAddress: from,
         ReplyToAddresses: [replyTo],
         Destination: { ToAddresses: [email.to] },
-        Content: { Simple: { Subject: { Data: email.subject, Charset: "UTF-8" }, Body: { Text: { Data: email.text, Charset: "UTF-8" } } } },
+        Content: { Simple: {
+          Subject: { Data: email.subject, Charset: "UTF-8" },
+          Body: { Text: { Data: email.text, Charset: "UTF-8" } },
+          // Lets Gmail, Yahoo and others show their own one-click "Unsubscribe" button.
+          Headers: email.oneClickUnsubscribeUrl ? [
+            { Name: "List-Unsubscribe", Value: `<${email.oneClickUnsubscribeUrl}>` },
+            { Name: "List-Unsubscribe-Post", Value: "List-Unsubscribe=One-Click" },
+          ] : undefined,
+        } },
       }));
     },
   };

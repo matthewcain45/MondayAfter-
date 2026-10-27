@@ -119,7 +119,8 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - **Deploy test copy**: runs every check first, then deploys.
   - **Send Incident File**: needs `SEND` typed to confirm.
   - **Export spreadsheets**: files go to a private S3 bucket and delete themselves after 7 days. They never pass through GitHub.
-- GitHub gets short-lived access through the `tma-github-deploy` role. Its permissions are the inline policy in `infra/github-deploy-role-policy.json`, managed in IAM; `infra/github-deploy-role.yaml` records the full setup. It is limited to this repository and its working branch. There are no stored AWS keys. **Never run deploy commands from a Claude session**, and never add AWS keys anywhere.
+- **Stable `main` branch (owner's decision, 27 October 2026):** the buttons work only from `main` (each checks this first, and the role's trust setting allows only `refs/heads/main` once the owner has updated it; steps in `docs/main-branch.md`). Claude works on its own branch and opens a pull request into `main` when the owner asks for changes to go live; the owner merges it, then presses Deploy from `main`.
+- GitHub gets short-lived access through the `tma-github-deploy` role. Its permissions are the inline policy in `infra/github-deploy-role-policy.json`, managed in IAM; `infra/github-deploy-role.yaml` records the full setup. It is limited to this repository and its `main` branch. There are no stored AWS keys. **Never run deploy commands from a Claude session**, and never add AWS keys anywhere.
 - The `AWS_DEPLOY_ROLE_ARN` repository variable holds the role's address. It isn't a secret.
 
 ### How the code is laid out
@@ -153,6 +154,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 
 - Put scenario text and reader input into pages as text only. Never use `innerHTML` with them.
 - Personal links travel in the `#t=` part of the address, which browsers don't send to servers. They are removed from the address bar straight away, and are sent to the backend only in the `X-TMA-Link` header. Never put them in query strings or logs.
+- **The one exception (owner's decision, 27 October 2026): one-click unsubscribe.** Monthly file and follow-up emails carry `List-Unsubscribe` and `List-Unsubscribe-Post` headers pointing at `POST /api/unsubscribe/one-click/<token>`. That token has purpose `unsubscribe`: it can only unsubscribe, only by POST (link-checking robots use GET), and the router logs the path without it. The confirm and flight recorder emails don't carry it.
 - "Share this file" shares a general link, never the reader's personal link.
 - Flight recorder text goes only to `PUT /api/file/recorder`, and is encrypted there. Never put it in saved state, `track()`, logs or exports. The browser doesn't keep it in live mode.
 - Never log request bodies, email addresses, tokens or internet addresses. Security notes go through `audit()` (`backend/src/audit.ts`) with fixed words and internal IDs only, and are kept 90 days (owner's decision, 27 October 2026). The privacy notice describes them.
