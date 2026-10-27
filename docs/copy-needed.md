@@ -2,20 +2,17 @@
 
 **Status (26 October 2026):** the copy from "The Monday After: copy to review (Incident File 01)" is in the app. That covers all 34 original gaps, the ledger rules, the closing lines and every take-back action. Run `node scripts/check-scenario.mjs` to see what's left.
 
-## Still to write: the "flipped" ledger versions (10 items)
+## Still to write (1 item)
 
-Your copy document proposed rules for when a ledger row turns from Drain to Deposit (or back), and said the flipped lines would follow once the rules were confirmed. The rules are now in the app exactly as proposed. Each flipped version needs a one-line summary, and the detail page needs the same five parts as the others: intro, Monday, Three months on, Next time, Assured on paper.
+**Status (27 October 2026):** the owner's edits from the wording spreadsheet are in, including 8 of the 9 remaining ledger lines. One is left:
 
 | Row | Version still to write | Shown when |
 |---|---|---|
-| Dependency | Deposit: summary and detail | Decision 2 is "Find out what else is at risk" |
-| Energy | Deposit: summary and detail | HR leads (B1), or "Plan Monday without them" |
-| Trust | Drain: summary and detail | You took over (B3) and chose neither D nor E |
-| Visibility | Drain: summary and detail | Neither A nor "Find out what else is at risk" |
-| Decision rights | Drain: detail page only (the summary is written) | No owner agreed out loud |
-| Delivery | Deposit: detail page only (the summary is written) | F and "Plan Monday without them" |
+| Decision rights | Drain: the detail page (Monday, Three months on, Next time, Assured on paper). The summary and the intro line are written | The row shows if the reader opened "Are you owning this?" or "Who should have checked?", or chose "Escalate". The Drain version shows unless they chose "Back HR, visibly" or "Shared, by design" |
 
-Until they're written, these show on screen as **"Copy needed"**, but only for readers on those routes.
+Until it's written, this shows on screen as **"Copy needed"**, but only for readers on that route.
+
+**Written as one paragraph:** the Dependency deposit, Energy deposit, Trust "IT is firmly in charge" and Delivery deposit detail pages. They show as a single paragraph rather than the four-part layout.
 
 ## Choices made while putting the copy in, to confirm
 

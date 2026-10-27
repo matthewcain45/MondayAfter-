@@ -677,11 +677,13 @@
             },
             {
               "effect": "drain",
-              "summary": {
-                "todo": "Visibility, Drain version (no list was built): one-line summary"
-              },
+              "summary": "It was handled quietly. Responsibility still sits with the agency, but you don’t have an organisational view of your contractors for when the next incident occurs.",
               "detail": {
-                "todo": "Visibility, Drain version: detail page"
+                "intro": "How much of the organisation you can see, and how quickly.",
+                "monday": "Pay landed and the questions stopped. Getting there took calls to managers, HR and the agency, pieced together by hand over a weekend.",
+                "threeMonths": "Nobody wrote down what was found. The names and contacts gathered that weekend sit in inboxes and notebooks.",
+                "nextTime": "You start from a guess again, and do the same unusual work to find the same people.",
+                "paper": "The incident log says resolved, no lasting impact. It doesn’t record that nobody could list the people affected."
               }
             }
           ],
