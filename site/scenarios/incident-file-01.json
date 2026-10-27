@@ -9,7 +9,7 @@
     "paragraphs": [
       "The agency that supplies your temps and contract workers uses an outside payroll provider. This afternoon it went down.",
       "This week's pay hasn't landed. The agency says “a delay.” The provider says “a technical issue.”",
-      "The contract sits with HR. IT has never seen it. Your organisation doesn't have a list of its contractors",
+      "The contract sits with HR. IT has never seen it. Your organisation doesn't have a list of its contractors.",
       "Some are on big contracts with a cushion. Some are on a few hours a week and need Friday's money."
     ],
     "question": "What do you do first?",
@@ -61,7 +61,7 @@
         "progress": 40
       },
       "title": "Your first move.",
-      "intro": "Pick one or two. Your answers shape what happens next",
+      "intro": "Pick one or two. Your answers shape what happens next.",
       "min": 1,
       "max": 2,
       "counter": true,
@@ -135,7 +135,7 @@
           "short": "Talk to the unions early",
           "assumption": {
             "lens": "Organisational design",
-            "text": "You can have a sensible conversation with workers representatives. Your proactive approach will be welcomed and they won't use the opportunity to increase tensions in the relationship."
+            "text": "You can have a sensible conversation with workers’ representatives. Your proactive approach will be welcomed and they won't use the opportunity to increase tensions in the relationship."
           },
           "takeBack": {
             "label": "Find out who in your organisation talks to worker representatives, and meet them.",
@@ -153,7 +153,7 @@
             "text": "You know which services these people keep running, and which of them are on your incident team."
           },
           "takeBack": {
-            "label": "Identify the mission critical work, and model the impact of reduced capacity on service levels.",
+            "label": "Identify the mission-critical work, and model the impact of reduced capacity on service levels.",
             "from": "Reveal 1, protect the critical work"
           }
         }
@@ -193,7 +193,7 @@
           "id": "B1",
           "key": "B1",
           "title": "HR leads, IT supports.",
-          "short": "This is HR’s problem.",
+          "short": "This is HR’s problem",
           "body": "The contract owner makes the call.",
           "assumption": {
             "lens": "Organisational design",
@@ -340,7 +340,7 @@
           "when": {
             "picked": "d1:A"
           },
-          "text": "Because you built the list, you can deal directly with contractors and make short term arrangements."
+          "text": "Because you built the list, you can deal directly with contractors and make short-term arrangements."
         }
       ],
       "threadsBeforeOptions": [
@@ -359,14 +359,14 @@
         {
           "id": "2",
           "key": "2",
-          "title": "Brief the workers",
-          "short": "Tell the workers what you do and don't know.",
+          "title": "Brief the workers.",
+          "short": "Tell the workers what you do and don't know",
           "body": "Say what you know and what you don't, before the group chat does it for you."
         },
         {
           "id": "3",
           "key": "3",
-          "title": "Escalate",
+          "title": "Escalate.",
           "short": "Escalate for a policy call",
           "body": "Ask the CEO / CFO for a decision on paying workers directly."
         },
@@ -498,8 +498,8 @@
               "detail": {
                 "intro": "How much you lean on contractors and suppliers, and how many layers deep.",
                 "monday": "Part of your own incident team turns out to be paid through the same chain as the workers who might walk.",
-                "threeMonths": "Nobody has mapped what else those contractors can reach, and the same agency still supplies them.",
-                "nextTime": "The next failure exposes similar supply chain dependencies, gaps in your data and dependence on contractors",
+                "threeMonths": "Nobody has mapped the organisation’s dependence on contractors.",
+                "nextTime": "The next failure exposes similar supply chain dependencies, gaps in your data and dependence on contractors.",
                 "paper": "Assurance covered the agency. It wasn't designed to interrogate the whole supply chain."
               }
             }
@@ -512,7 +512,7 @@
           "summary": "The agency was your only route to these workers. And they were dependent on at least one supplier. You haven't uncovered their other single points of failure.",
           "detail": {
             "intro": "Where one failure stops everything, and how many layers down it sits.",
-            "monday": "Your only route to these workers was one agency. It was dependent on one provider. One failed so they both failed.",
+            "monday": "Your only route to these workers was one agency. It was dependent on one provider. One failed, so they both failed.",
             "threeMonths": "The agency has promised a backup plan. Nobody has analysed how dependent your organisation is on the same supplier.",
             "nextTime": "The next single point of failure is one you have not found yet, in a supplier nobody has asked you about.",
             "paper": "Your supplier register lists the agency but does not map the supply chain."
@@ -565,7 +565,7 @@
                 ]
               },
               "effect": "deposit",
-              "summary": "The HR team is better-placed to manage its suppliers",
+              "summary": "The HR team is better placed to manage its suppliers.",
               "detail": "The HR team has built capability to manage one of its key suppliers and now puts greater value on the IT assurance processes that your team requires."
             },
             {
@@ -608,7 +608,7 @@
                 ]
               },
               "effect": "drain",
-              "summary": "IT is firmly in charge but can it reduce risk?",
+              "summary": "IT is firmly in charge, but can it reduce risk?",
               "detail": "The decision has expanded the scope of your IT function without increasing its budget or capacity. You're better placed to govern the response to the next problem but don't have the levers to reduce the likelihood that there will be a problem."
             },
             {
@@ -635,7 +635,7 @@
                 ]
               },
               "effect": "deposit",
-              "summary": "Finance HR and IT have collaborated successfully and can again",
+              "summary": "Finance, HR and IT worked together successfully and value IT’s governance processes more highly. How can you use that to increase compliance across the organisation?",
               "detail": {
                 "intro": "How far people will rely on each other when it is not clear who is in charge.",
                 "monday": "Finance and HR paid people together for the first time, and each saw the other work under pressure.",
