@@ -2,15 +2,9 @@
 
 **Status (26 October 2026):** the copy from "The Monday After: copy to review (Incident File 01)" is in the app. That covers all 34 original gaps, the ledger rules, the closing lines and every take-back action. Run `node scripts/check-scenario.mjs` to see what's left.
 
-## Still to write (1 item)
+## Still to write
 
-**Status (27 October 2026):** the owner's edits from the wording spreadsheet are in, including 8 of the 9 remaining ledger lines. One is left:
-
-| Row | Version still to write | Shown when |
-|---|---|---|
-| Decision rights | Drain: the detail page (Monday, Three months on, Next time, Assured on paper). The summary and the intro line are written | The row shows if the reader opened "Are you owning this?" or "Who should have checked?", or chose "Escalate". The Drain version shows unless they chose "Back HR, visibly" or "Shared, by design" |
-
-Until it's written, this shows on screen as **"Copy needed"**, but only for readers on that route.
+**Status (27 October 2026):** nothing. Every ledger version is written. The last two (Visibility drain and Decision rights drain) were written with the owner.
 
 **Written as one paragraph:** the Dependency deposit, Energy deposit, Trust "IT is firmly in charge" and Delivery deposit detail pages. They show as a single paragraph rather than the four-part layout.
 

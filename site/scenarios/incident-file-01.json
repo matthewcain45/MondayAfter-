@@ -734,7 +734,11 @@
               "effect": "drain",
               "summary": "The CEO asked who was leading and heard two answers.",
               "detail": {
-                "todo": "Decision rights, Drain version: detail page"
+                "intro": "Who is allowed to make which call, and whether everyone knows it.",
+                "monday": "The CEO asked who was leading and heard two answers. The agency and the workers got mixed messages while IT and HR sorted it out between them.",
+                "threeMonths": "Nobody has agreed who owns a supplier incident. It’s still settled on the day, by whoever picks up the phone.",
+                "nextTime": "The same question is asked again, in the middle of the next incident, and gets the same two answers.",
+                "paper": "There are clear accountabilities for each department and the boundaries are respected. Until a crisis cuts across two departments and no one is sure who should lead."
               }
             }
           ],
