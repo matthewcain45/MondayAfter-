@@ -17,7 +17,7 @@ export function confirmEmail(to: string, brand: string, confirmUrl: string): Ema
     to,
     subject: "Confirm your email for " + brand,
     text: [
-      "Someone (hopefully you) asked to receive " + brand + ", a short monthly incident file for aspiring CIOs.",
+      "Someone (hopefully you) asked to receive " + brand + ", a short monthly incident file for technology leaders.",
       "",
       "Confirm your email here:",
       confirmUrl,

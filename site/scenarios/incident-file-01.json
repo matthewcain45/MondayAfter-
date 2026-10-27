@@ -4,16 +4,16 @@
   "brand": "The Monday After",
   "replyAddress": "themondayafter@capstoneglobaladvisory.com",
   "email": {
-    "subject": "Your temps and contractors haven't been paid. Nobody will say why.",
+    "subject": "Your temps and contractors haven't been paid. Nobody knows why.",
     "time": "FRIDAY, 16:40.",
     "paragraphs": [
       "The agency that supplies your temps and contract workers uses an outside payroll provider. This afternoon it went down.",
       "This week's pay hasn't landed. The agency says “a delay.” The provider says “a technical issue.”",
-      "You don't have a single list of who these people are. The contract sits with HR. IT has never seen it.",
-      "Some are on big contracts with a cushion. Some are on a few hours a week and need Friday's money. Monday is three days away."
+      "The contract sits with HR. IT has never seen it. Your organisation doesn't have a list of its contractors",
+      "Some are on big contracts with a cushion. Some are on a few hours a week and need Friday's money."
     ],
     "question": "What do you do first?",
-    "button": "Make your first call →",
+    "button": "Make your first decision →",
     "footnote": "2 minutes to your first decision. No login. A fictional scenario built on real patterns."
   },
   "screens": [
@@ -37,8 +37,7 @@
         "kicker": "What you know",
         "items": [
           "This week's pay hasn't landed.",
-          "The agency says “a delay.” Its payroll provider says “a technical issue.”",
-          "Monday is three days away."
+          "The agency says “a delay.” Its payroll provider says “a technical issue.”"
         ]
       },
       "dontKnow": {
@@ -46,7 +45,7 @@
         "items": [
           "Whether it's an outage or an attack",
           "Whether your data is safe",
-          "Who these people are, in one list",
+          "Who these people are",
           "When pay will land"
         ]
       },
@@ -62,7 +61,7 @@
         "progress": 40
       },
       "title": "Your first move.",
-      "intro": "Pick one or two. You'll lock in before you see anything.",
+      "intro": "Pick one or two. Your answers shape what happens next",
       "min": 1,
       "max": 2,
       "counter": true,
@@ -73,13 +72,13 @@
           "key": "A",
           "title": "Build the list.",
           "short": "Build the list",
-          "body": "Find out who these workers are, where they sit, and who is most exposed.",
+          "body": "Find out who these workers are, and which departments are most exposed.",
           "assumption": {
             "lens": "Technical architecture",
-            "text": "The list can be built from access records, purchase orders and managers' memories, and the agency will share data lawfully."
+            "text": "The list can be built from access records, purchase orders and managers' memories and can be completed in a few hours."
           },
           "takeBack": {
-            "label": "Check whether you could build a list of every temp and contractor today, and note which sources you would use.",
+            "label": "Check whether you could build a list of every temp and contractor today, and note which sources you would use. Consider how you would keep this up to date.",
             "from": "Reveal 1, build the list"
           }
         },
@@ -92,10 +91,10 @@
           "body": "Use the contract to demand facts and a date.",
           "assumption": {
             "lens": "Governance",
-            "text": "The agency can and will tell the truth, and a contract nobody in IT has read gives you leverage over their supplier."
+            "text": "The agency will prioritise your request and the contract gives you real leverage over their supplier."
           },
           "takeBack": {
-            "label": "Find out whether anyone has read the agency contract.",
+            "label": "Find out what obligations rest on the agency and whether these are sufficient to protect your organisation.",
             "from": "Reveal 1, press the agency"
           }
         },
@@ -122,7 +121,7 @@
           "body": "A short, honest message saying you don't yet know.",
           "assumption": {
             "lens": "Leadership",
-            "text": "You know enough to say something true, and what you say will not be read as a promise to pay or an admission of fault."
+            "text": "You know enough to say something that people will find reassuring and the gaps in your knowledge won't create greater anxiety. What you say will not be read as a promise to pay or an admission of fault."
           },
           "takeBack": {
             "label": "Draft the first message you would send to contractors, and note who must approve it.",
@@ -136,7 +135,7 @@
           "short": "Talk to the unions early",
           "assumption": {
             "lens": "Organisational design",
-            "text": "Someone in your organisation already has a working relationship with worker representatives, and can speak for a workforce nobody has listed."
+            "text": "You can have a sensible conversation with workers representatives. Your proactive approach will be welcomed and they won't use the opportunity to increase tensions in the relationship."
           },
           "takeBack": {
             "label": "Find out who in your organisation talks to worker representatives, and meet them.",
@@ -148,13 +147,13 @@
           "key": "F",
           "title": "Protect the critical work.",
           "short": "Protect the critical work",
-          "body": "Ask managers where the service leans on these workers, and plan for absences.",
+          "body": "Ask managers where their service depends on these workers, and notify them to develop a plan for absences.",
           "assumption": {
             "lens": "Technical architecture",
             "text": "You know which services these people keep running, and which of them are on your incident team."
           },
           "takeBack": {
-            "label": "List the three pieces of work that must not stop, and who does each.",
+            "label": "Identify the mission critical work, and model the impact of reduced capacity on service levels.",
             "from": "Reveal 1, protect the critical work"
           }
         }
@@ -185,7 +184,7 @@
         ]
       },
       "title": "Who's holding the phone?",
-      "intro": "You chose to press the agency. The contract sits with HR. IT has never seen it. Choose one.",
+      "intro": "You chose to press the agency. The contract sits with HR. IT doesn't have a relationship or access to the contract. Choose one.",
       "min": 1,
       "max": 1,
       "keyStyle": "code",
@@ -194,14 +193,14 @@
           "id": "B1",
           "key": "B1",
           "title": "HR leads, IT supports.",
-          "short": "HR leads",
+          "short": "This is HR’s problem.",
           "body": "The contract owner makes the call.",
           "assumption": {
             "lens": "Organisational design",
             "text": "HR can run a supplier incident, has the standing to ask other teams for help, and will tell you early enough for IT to matter."
           },
           "takeBack": {
-            "label": "Ask HR whether they have ever run a supplier incident, and what they would want from IT.",
+            "label": "Ask HR whether they are confident in running a supplier incident, and what they would want from IT.",
             "from": "Reveal 1, HR leads"
           }
         },
@@ -210,7 +209,7 @@
           "key": "B2",
           "title": "HR asks for your help, and you step in alongside.",
           "short": "HR asks, you step in",
-          "body": "You work the problem together.",
+          "body": "You form a small crisis management team together.",
           "assumption": {
             "lens": "Leadership",
             "text": "HR will ask, you have capacity, and a working relationship exists to ask through."
@@ -225,10 +224,10 @@
           "key": "B3",
           "title": "You take the lead.",
           "short": "You take over",
-          "body": "You pull it from HR because you think they can't handle it.",
+          "body": "You take it from HR because you think they can't handle it.",
           "assumption": {
             "lens": "Leadership",
-            "text": "HR will let go of it, the CEO will back you, and taking it will not cost you the relationship you need next time."
+            "text": "HR will let go of it cleanly, the CEO will back you, and taking it is worth the risk to your relationship."
           },
           "takeBack": {
             "label": "Agree with the CEO and HR, in advance, when IT takes the lead and when it does not.",
@@ -282,7 +281,7 @@
         {
           "type": "card",
           "kicker": "Phone · The agency",
-          "text": "The agency calls back. Its payroll provider “cannot rule out” a security incident. No pay date."
+          "text": "The agency calls back. Its payroll provider “cannot rule out” a security incident but says that there's no evidence personally identifiable information has been stolen. There isn't a timeframe for solving the problem."
         },
         {
           "type": "thread",
@@ -341,7 +340,7 @@
           "when": {
             "picked": "d1:A"
           },
-          "text": "Because you built the list, bridging is possible."
+          "text": "Because you built the list, you can deal directly with contractors and make short term arrangements."
         }
       ],
       "threadsBeforeOptions": [
@@ -360,23 +359,23 @@
         {
           "id": "2",
           "key": "2",
-          "title": "Tell the workers the truth.",
-          "short": "Tell the workers the truth",
+          "title": "Brief the workers",
+          "short": "Tell the workers what you do and don't know.",
           "body": "Say what you know and what you don't, before the group chat does it for you."
         },
         {
           "id": "3",
           "key": "3",
-          "title": "Escalate for a policy call.",
+          "title": "Escalate",
           "short": "Escalate for a policy call",
-          "body": "Ask the CEO whether to pay workers directly, suspend the agency, or hold."
+          "body": "Ask the CEO / CFO for a decision on paying workers directly."
         },
         {
           "id": "4",
           "key": "4",
           "title": "Find out what else is at risk.",
           "short": "Find out what else is at risk",
-          "body": "Who else does this provider serve, and what can its people get to on your side?"
+          "body": "Who else does this provider serve and how can you leverage those relationships?"
         },
         {
           "id": "5",
@@ -396,7 +395,7 @@
         "step": "4 of 5"
       },
       "title": "Before you see how it landed.",
-      "intro": "If this happened in your organisation, what would you actually do? Write it as you’d say it to your team. When the next incident hits, you can compare.",
+      "intro": "If this happened in your organisation, what would you do? Write it as you’d say it to your team. When the next incident hits, you can compare.",
       "fields": [
         {
           "id": "hour",
@@ -490,12 +489,8 @@
                 "picked": "d2:4"
               },
               "effect": "deposit",
-              "summary": {
-                "todo": "Dependency, Deposit version (you found out what else is at risk): one-line summary"
-              },
-              "detail": {
-                "todo": "Dependency, Deposit version: detail page"
-              }
+              "summary": "You’ve spotted gaps in your supply chain management.",
+              "detail": "You have identified gaps in your understanding of supply chain risks. You've used the incident to build a clearer picture and make informed decisions next time."
             },
             {
               "effect": "drain",
@@ -504,8 +499,8 @@
                 "intro": "How much you lean on contractors and suppliers, and how many layers deep.",
                 "monday": "Part of your own incident team turns out to be paid through the same chain as the workers who might walk.",
                 "threeMonths": "Nobody has mapped what else those contractors can reach, and the same agency still supplies them.",
-                "nextTime": "The next failure arrives through the same door.",
-                "paper": "Assurance covered the agency. It never covered who pays the agency's workers."
+                "nextTime": "The next failure exposes similar supply chain dependencies, gaps in your data and dependence on contractors",
+                "paper": "Assurance covered the agency. It wasn't designed to interrogate the whole supply chain."
               }
             }
           ]
@@ -514,16 +509,16 @@
           "id": "spof",
           "dimension": "Single point of failure",
           "effect": "drain",
-          "summary": "The agency was your only route to these workers. The payroll provider was theirs.",
+          "summary": "The agency was your only route to these workers. And they were dependent on at least one supplier. You haven't uncovered their other single points of failure.",
           "detail": {
             "intro": "Where one failure stops everything, and how many layers down it sits.",
-            "monday": "Your only route to these workers was one agency. Its only route to pay them was one provider. Both failed together.",
-            "threeMonths": "The agency has promised a second payroll provider. Nobody has asked whether your other suppliers rely on the same one.",
+            "monday": "Your only route to these workers was one agency. It was dependent on one provider. One failed so they both failed.",
+            "threeMonths": "The agency has promised a backup plan. Nobody has analysed how dependent your organisation is on the same supplier.",
             "nextTime": "The next single point of failure is one you have not found yet, in a supplier nobody has asked you about.",
-            "paper": "Your supplier register lists the agency. It does not show the payroll provider behind it, or what else that provider carries for you."
+            "paper": "Your supplier register lists the agency but does not map the supply chain."
           },
           "takeBack": {
-            "label": "Pick one supplier and ask who its single point of failure is.",
+            "label": "Pick one supplier and map its dependencies.",
             "from": "Single point of failure"
           }
         },
@@ -552,10 +547,10 @@
               "summary": "Three people carried the weekend, and now they're the only ones who know how it worked.",
               "detail": {
                 "intro": "How much the people who carried the response have left, and who else can do what they did.",
-                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could.",
+                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could help. Other team members grumble about their lack of opportunity.",
                 "threeMonths": "The same three are called first for every incident. The work they put aside has not been picked up.",
-                "nextTime": "The next incident starts with the same three people, already tired.",
-                "paper": "The incident plan names a team. It does not say who steps in when the same three are worn out."
+                "nextTime": "The next incident starts with the same three people, already tired. They're starting to depend on the overtime involved.",
+                "paper": "The incident plan names a team with all the usual suspects. There isn't a plan for what happens when they're burnt out."
               }
             },
             {
@@ -570,22 +565,18 @@
                 ]
               },
               "effect": "deposit",
-              "summary": {
-                "todo": "Energy, Deposit version (HR led, or you planned Monday without them): one-line summary"
-              },
-              "detail": {
-                "todo": "Energy, Deposit version: detail page"
-              }
+              "summary": "The HR team is better-placed to manage its suppliers",
+              "detail": "The HR team has built capability to manage one of its key suppliers and now puts greater value on the IT assurance processes that your team requires."
             },
             {
               "effect": "drain",
               "summary": "Three people carried the weekend, and now they're the only ones who know how it worked.",
               "detail": {
                 "intro": "How much the people who carried the response have left, and who else can do what they did.",
-                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could.",
+                "monday": "Three people carried the weekend. They did it well, so nobody asked who else could help. Other team members grumble about their lack of opportunity.",
                 "threeMonths": "The same three are called first for every incident. The work they put aside has not been picked up.",
-                "nextTime": "The next incident starts with the same three people, already tired.",
-                "paper": "The incident plan names a team. It does not say who steps in when the same three are worn out."
+                "nextTime": "The next incident starts with the same three people, already tired. They're starting to depend on the overtime involved.",
+                "paper": "The incident plan names a team with all the usual suspects. There isn't a plan for what happens when they're burnt out."
               }
             }
           ],
@@ -617,12 +608,8 @@
                 ]
               },
               "effect": "drain",
-              "summary": {
-                "todo": "Trust, Drain version (you took over from HR): one-line summary"
-              },
-              "detail": {
-                "todo": "Trust, Drain version: detail page"
-              }
+              "summary": "IT is firmly in charge but can it reduce risk?",
+              "detail": "The decision has expanded the scope of your IT function without increasing its budget or capacity. You're better placed to govern the response to the next problem but don't have the levers to reduce the likelihood that there will be a problem."
             },
             {
               "when": {
@@ -648,7 +635,7 @@
                 ]
               },
               "effect": "deposit",
-              "summary": "Finance and HR paid people together for the first time.",
+              "summary": "Finance HR and IT have collaborated successfully and can again",
               "detail": {
                 "intro": "How far people will rely on each other when it is not clear who is in charge.",
                 "monday": "Finance and HR paid people together for the first time, and each saw the other work under pressure.",
@@ -738,7 +725,7 @@
                 "monday": "The CEO asked who was leading and got one answer.",
                 "threeMonths": "The agreement was spoken, not written. People remember it differently, and the next contract will be signed without it.",
                 "nextTime": "The same question is answered in minutes, if the answer is written down.",
-                "paper": "The delegation scheme says who can sign off payments. It does not say who can decide to pay people outside the usual chain."
+                "paper": "The delegation scheme says who can sign off payments. But there wasn't clear governance for agreeing to step outside the process."
               }
             },
             {
@@ -787,19 +774,17 @@
               },
               "effect": "deposit",
               "summary": "You decided what stopped first, so the rest of the work slowed on purpose.",
-              "detail": {
-                "todo": "Delivery, Deposit version: detail page"
-              }
+              "detail": "You made a proactive decision to communicate that some work has slowed. Colleagues understand why and your teams are working under less pressure as a result."
             },
             {
               "effect": "drain",
               "summary": "Planned work stopped while you looked after this, and nobody counted what.",
               "detail": {
                 "intro": "What the rest of the organisation did not get done because of the response.",
-                "monday": "Three people left planned work to cover the weekend. Their projects waited, quietly.",
+                "monday": "Three people left planned work to cover the weekend. They are compensated but tired. What's the impact on their planned work?",
                 "threeMonths": "Two pieces of work have slipped. The reasons are not on any report.",
                 "nextTime": "The same work stops first again, because nobody agreed in advance what should.",
-                "paper": "The portfolio report is green. It does not know about the weekend."
+                "paper": "The portfolio report is green for now. The impact of this weekend won't be visible immediately."
               }
             }
           ],

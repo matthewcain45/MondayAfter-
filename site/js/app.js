@@ -670,7 +670,9 @@
     const box = (kicker, text, cls) => h("div", { class: "card " + (cls || "") }, h("div", { class: "kicker " + (cls ? "coral" : "amber") }, kicker), h("p", { class: "lead" }, t(text)));
     page({ label: "The Monday After · Thread", step: "Optional" }, r.dimension, [
       h("div", { class: "row-head" }, h("h1", { class: "big" }, r.dimension), effect),
-      isTodo(d) ? h("p", {}, t(d)) : [
+      isTodo(d) ? h("p", {}, t(d))
+        : typeof d === "string" ? h("p", { class: "intro", style: "font-size:.94rem" }, d) // a detail written as one paragraph
+        : [
         h("p", { class: "intro", style: "font-size:.94rem" }, d.intro),
         box("Monday", d.monday),
         box("Three months on", d.threeMonths),
