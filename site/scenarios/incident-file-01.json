@@ -411,7 +411,7 @@
           "label": "First week · Optional"
         }
       ],
-      "privacy": "No names or confidential detail. Write it as a pattern. Private to you: encrypted, and the author can’t read it. Timestamped, saved before the ledger.",
+      "privacy": "No names or confidential detail. Write it as a pattern. Encrypted and private to you: The Monday After team can’t read it. Timestamped, saved before the ledger.",
       "button": "Save and continue",
       "skip": "Skip, show me the result"
     },
@@ -460,7 +460,7 @@
         }
       ],
       "button": "Show me the Monday After →",
-      "privacy": "Only you and the author see your forecast."
+      "privacy": "Only you and The Monday After team see your forecast."
     },
     {
       "id": "ledger",

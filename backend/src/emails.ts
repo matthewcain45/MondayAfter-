@@ -69,7 +69,7 @@ export function recorderEmail(to: string, brand: string, fileTitle: string, save
       "When the next incident hits, compare it with what you actually do.",
       "",
       ...entries.flatMap((e) => [e.label.toUpperCase(), e.text || "(left blank)", ""]),
-      "Only you can see this. The author of " + brand + " can't read your flight recorder.",
+      "Only you can see this. " + brand + " team can't read your flight recorder.",
       footer(manageUrl),
     ].join("\n"),
   };
