@@ -490,7 +490,13 @@
               },
               "effect": "deposit",
               "summary": "You’ve spotted gaps in your supply chain management.",
-              "detail": "You have identified gaps in your understanding of supply chain risks. You've used the incident to build a clearer picture and make informed decisions next time."
+              "detail": {
+                "intro": "How much you lean on contractors and suppliers, and how many layers deep.",
+                "monday": "You asked what else this provider touches. Part of your own incident team turned out to be paid through the same chain, and now you know.",
+                "threeMonths": "You have a clearer picture of your supply chain risks, beyond the agency. It’s partial, but it’s written down.",
+                "nextTime": "You make informed decisions from a map of your supply chain, not from the first supplier who calls.",
+                "paper": "Assurance still checks the agency. You now know which questions it doesn’t ask about the suppliers behind it."
+              }
             },
             {
               "effect": "drain",
@@ -566,7 +572,13 @@
               },
               "effect": "deposit",
               "summary": "The HR team is better placed to manage its suppliers.",
-              "detail": "The HR team has built capability to manage one of its key suppliers and now puts greater value on the IT assurance processes that your team requires."
+              "detail": {
+                "intro": "How much the people who carried the response have left, and who else can do what they did.",
+                "monday": "The weekend didn’t fall on the same three people. Others stepped in, and HR built capability to manage one of its key suppliers.",
+                "threeMonths": "HR handles the agency with more confidence, and now puts greater value on the IT assurance processes your team requires.",
+                "nextTime": "More than one team can lead a supplier incident, and IT’s people start it rested.",
+                "paper": "The incident plan still names IT’s usual team. In practice, the load is now shared with HR."
+              }
             },
             {
               "effect": "drain",
@@ -609,7 +621,13 @@
               },
               "effect": "drain",
               "summary": "IT is firmly in charge, but can it reduce risk?",
-              "detail": "The decision has expanded the scope of your IT function without increasing its budget or capacity. You're better placed to govern the response to the next problem but don't have the levers to reduce the likelihood that there will be a problem."
+              "detail": {
+                "intro": "How far people will rely on each other when it is not clear who is in charge.",
+                "monday": "You took the incident from HR and ran it. It worked, and everyone now looks to IT when something goes wrong.",
+                "threeMonths": "The decision has expanded the scope of your IT function without increasing its budget or capacity. HR has stepped back from supplier risk it used to own.",
+                "nextTime": "You’re better placed to govern the response to the next problem, but you don’t have the levers to reduce the likelihood that there will be one.",
+                "paper": "HR still owns the agency contract on paper. In practice, everyone expects IT to answer for it."
+              }
             },
             {
               "when": {
@@ -780,7 +798,13 @@
               },
               "effect": "deposit",
               "summary": "You decided what stopped first, so the rest of the work slowed on purpose.",
-              "detail": "You made a proactive decision to communicate that some work has slowed. Colleagues understand why and your teams are working under less pressure as a result."
+              "detail": {
+                "intro": "What the rest of the organisation did not get done because of the response.",
+                "monday": "You made a proactive decision about what to pause, and told people why. Work slowed on purpose and in the open.",
+                "threeMonths": "The paused work has restarted. Colleagues understood the delay, and your teams worked under less pressure as a result.",
+                "nextTime": "You start from a list of what stops first, agreed before anyone needs it.",
+                "paper": "The portfolio report shows the delay, with its reason. Nobody is surprised by it."
+              }
             },
             {
               "effect": "drain",

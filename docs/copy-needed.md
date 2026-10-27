@@ -6,7 +6,7 @@
 
 **Status (27 October 2026):** nothing. Every ledger version is written. The last two (Visibility drain and Decision rights drain) were written with the owner.
 
-**Written as one paragraph:** the Dependency deposit, Energy deposit, Trust "IT is firmly in charge" and Delivery deposit detail pages. They show as a single paragraph rather than the four-part layout.
+Every detail page now has the four-part layout (Monday, Three months on, Next time, Assured on paper).
 
 ## Choices made while putting the copy in, to confirm
 
