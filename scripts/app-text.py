@@ -91,7 +91,7 @@ CODE = [
     ("backend/src/emails.ts", "Take a break, unsubscribe or delete your data: ", "Every email · footer (then the link)"),
     ("backend/src/emails.ts", "Confirm your email for ", "Confirm email · subject (then the name)"),
     ("backend/src/emails.ts", "Someone (hopefully you) asked to receive ", "Confirm email (then the name)"),
-    ("backend/src/emails.ts", ", a short monthly incident file for aspiring CIOs.", "Confirm email"),
+    ("backend/src/emails.ts", ", a short monthly incident file for technology leaders.", "Confirm email"),
     ("backend/src/emails.ts", "Confirm your email here:", "Confirm email"),
     ("backend/src/emails.ts", "This link works for 24 hours. If you didn't ask for this, ignore this email and nothing more will happen: we delete unconfirmed sign-ups after 7 days.", "Confirm email"),
     ("backend/src/emails.ts", "This link is personal to you. Please don't forward it; use Share this file at the end instead.", "Monthly file email · under the link"),
@@ -389,7 +389,7 @@ def apply(path):
                 continue
             changes.append((num, rel, json.loads(loc), current or "", str(new).strip()))
 
-    problems, done = [], 0
+    problems, done, renamed = [], 0, []
     scen = {}
     texts = {}
     for num, rel, loc, current, new in changes:
@@ -412,6 +412,7 @@ def apply(path):
             continue
         if loc["kind"] == "code":
             rep = json.dumps(new, ensure_ascii=False)
+            renamed.append((rel, raw, rep))
         elif loc["kind"] == "attr":
             name = raw.split("=", 1)[0]
             rep = f'{name}="' + new.replace("&", "&amp;").replace('"', "&quot;") + '"'
@@ -430,6 +431,11 @@ def apply(path):
         write(rel, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
     for rel, src in texts.items():
         write(rel, src)
+    # Keep this script's own list of code messages in step with the new wording.
+    me = Path(__file__).read_text(encoding="utf-8")
+    for rel, raw, rep in renamed:
+        me = me.replace(f'("{rel}", {raw},', f'("{rel}", {rep},')
+    Path(__file__).write_text(me, encoding="utf-8")
     print(f"Applied {done} change(s).")
     for p in problems:
         print("  " + p)
