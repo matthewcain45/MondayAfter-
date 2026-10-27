@@ -135,7 +135,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
   - `src/config.ts`: link lifetimes, submission limits and retention. Changing these is an "ask first" decision.
 - `infra/`: the AWS setup as code (CDK). `lib/stack.ts` describes one copy of the system, `lib/email-stack.ts` covers sending as the domain, `bin/app.ts` lists the stacks (`TheMondayAfter-email`, `TheMondayAfter-test`), and `test/stack.test.ts` checks the security rules (for example, that only the recorder mailer can decrypt).
 - `.github/workflows/`: the buttons (`deploy.yml`, `send-file.yml`, `export.yml`, `certificate.yml`).
-- `scripts/`: `preview.mjs` (local preview with the real backend code) and `check-scenario.mjs` (lists copy still needed and checks the rules are valid).
+- `scripts/`: `preview.mjs` (local preview with the real backend code), `check-scenario.mjs` (lists copy still needed and checks the rules are valid) and `app-text.py` (all reader-facing wording in one spreadsheet, `docs/app-text.xlsx`, and puts the owner's edits back). Re-export the spreadsheet after any wording change, and add new code messages to its `CODE` list.
 
 ### How to run and check it locally
 
@@ -144,6 +144,7 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - Preview: `node scripts/preview.mjs`, then open `http://localhost:8080/signup.html`. Sign up with a fake address such as `test.user@example.com`. The pretend emails appear at `http://localhost:8080/dev/`, with links to confirm. `/dev/send-file` sends Incident File 01, and `/dev/export` shows the spreadsheets. The `/dev/` pages exist only in the local preview and are never deployed.
 - Phone-style preview without the backend: `http://localhost:8080/preview/email.html`.
 - Copy check: `node scripts/check-scenario.mjs incident-file-01`
+- Wording spreadsheet: `python3 scripts/app-text.py export`, then, with the owner's returned file, `python3 scripts/app-text.py apply <file>.xlsx`, run the checks and tests, and export again.
 
 ### Rules for the code
 
