@@ -4,9 +4,10 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { BatchWriteCommand, DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, ScanCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { DecryptCommand, GenerateDataKeyCommand, KMSClient } from "@aws-sdk/client-kms";
-import { SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
+import { CloudWatchClient, GetMetricDataCommand } from "@aws-sdk/client-cloudwatch";
+import { GetAccountCommand, SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
 import { randomBytes } from "node:crypto";
-import type { AnswersRecord, EventRecord, KeyService, Link, Mailer, RecorderRecord, Store, Subscriber } from "../types.ts";
+import type { AnswersRecord, EventRecord, KeyService, Link, Mailer, RecorderRecord, SendingHealthSource, Store, Subscriber } from "../types.ts";
 
 export interface Tables {
   subscribers: string; // key: id; index "byEmail" on email
@@ -129,6 +130,29 @@ export function sesMailer(from: string, replyTo: string, client = new SESv2Clien
         Destination: { ToAddresses: [email.to] },
         Content: { Simple: { Subject: { Data: email.subject, Charset: "UTF-8" }, Body: { Text: { Data: email.text, Charset: "UTF-8" } } } },
       }));
+    },
+  };
+}
+
+// SES's own view of the account, plus the latest bounce and complaint rates,
+// which AWS publishes to CloudWatch for every SES account.
+export function sesHealth(ses = new SESv2Client({}), cloudwatch = new CloudWatchClient({})): SendingHealthSource {
+  return {
+    async read() {
+      const account = await ses.send(new GetAccountCommand({}));
+      const now = new Date();
+      const metric = (id: string, name: string) => ({ Id: id, MetricStat: { Metric: { Namespace: "AWS/SES", MetricName: name }, Period: 3600, Stat: "Maximum" } });
+      const r = await cloudwatch.send(new GetMetricDataCommand({
+        StartTime: new Date(now.getTime() - 2 * 86400 * 1000), EndTime: now, ScanBy: "TimestampDescending",
+        MetricDataQueries: [metric("bounce", "Reputation.BounceRate"), metric("complaint", "Reputation.ComplaintRate")],
+      }));
+      const latest = (id: string) => r.MetricDataResults?.find((m) => m.Id === id)?.Values?.[0] ?? null;
+      return {
+        sendingEnabled: account.SendingEnabled !== false,
+        enforcement: account.EnforcementStatus || "UNKNOWN",
+        bounceRate: latest("bounce"),
+        complaintRate: latest("complaint"),
+      };
     },
   };
 }

@@ -39,12 +39,18 @@ jobs:
           FILE_ID: ${{ github.event.inputs.file }}
           RUN_ID: ${{ github.run_id }}
         run: |
+          set -o pipefail # a failure below still turns the run red
           case "$FILE_ID" in *[!a-z0-9-]*|"") echo "Bad file name"; exit 1;; esac
           aws lambda invoke --function-name tma-test-sender --cli-read-timeout 320 \
             --cli-binary-format raw-in-base64-out --payload "{\"scenarioId\":\"$FILE_ID\",\"requestedBy\":\"$RUN_ID\"}" result.json > /dev/null
           node -e '
             const r = require("./result.json");
+            const rates = "- Bounce rate: " + r.bounceRate + " (limit 4%)\n- Complaint rate: " + r.complaintRate + " (limit 0.08%)";
+            if (r.blocked) {
+              console.log("## Not sent: sending is paused for safety\n\n" + r.reasons.map((x) => "- " + x).join("\n") + "\n\n" + rates + "\n\nNothing was sent. Ask Claude to help look into it before trying again.");
+              process.exit(1);
+            }
             if (typeof r.sent !== "number") { console.error("Send failed:", JSON.stringify(r)); process.exit(1); }
-            console.log("## Sent\n\n- Sent: " + r.sent + "\n- Failed: " + r.failed);
-            if (r.failed) console.log("\nWhile email is in test mode, only verified addresses can receive it. Failures are usually unverified addresses.");
+            console.log("## Sent\n\n- Sent: " + r.sent + "\n- Failed: " + r.failed + "\n\n### Sending health, checked before sending\n\n" + rates);
+            if (r.failed) console.log("\nA few failures can be addresses AWS refuses to email (for example, ones that bounced before). Ask Claude if there are more than one or two.");
           ' | tee -a "$GITHUB_STEP_SUMMARY"

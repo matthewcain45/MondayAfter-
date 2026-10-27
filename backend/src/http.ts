@@ -33,6 +33,8 @@ export const ROUTES: Record<string, { method: string; path: string; run: Handler
   resume: { method: "POST", path: "/api/resume", run: (svc, t) => svc.resume(t) },
   unsubscribe: { method: "POST", path: "/api/unsubscribe", run: (svc, t) => svc.unsubscribe(t) },
   deleteMe: { method: "POST", path: "/api/delete", run: (svc, t) => svc.deleteMe(t) },
+  followUpStatus: { method: "POST", path: "/api/followup", run: (svc, t) => svc.followUpStatus(t) },
+  answerFollowUp: { method: "POST", path: "/api/followup/answer", run: (svc, t, b) => svc.answerFollowUp(t, b) },
 };
 
 const MAX_BODY = 32 * 1024;

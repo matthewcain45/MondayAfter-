@@ -15,10 +15,10 @@ Status on 27 October 2026. ✅ done · 🔲 to do.
 
 | # | What | Who |
 |---|---|---|
-| 1 | **Penetration test:** fix any real findings, redeploy, then remove the verification file and clean up the test reader and AWS Security Agent | Owner runs the test; Claude fixes |
-| 2 | **The 30-day follow-up email.** Screen 11 promises "Ask me in 30 days whether I did it". It isn't built yet: either build it, or remove the tick until it is | Owner decides; Claude builds |
-| 3 | **The bounce and complaint check before each send,** as promised to AWS. A simple version would have the Send button show the current rates and refuse to send if they're too high | Claude builds |
-| 4 | **Make the current copy safe for real data.** It's set up as a "test" copy: if it were ever removed, its data would go with it. Either turn it into the live copy (keep data on removal, the same address, and early sign-ups kept), or build a separate live copy and move the address and sign-ups across | Owner decides; Claude builds |
+| 1 | **Penetration test: done.** The verification file is removed. Left: send Claude the findings; delete the test reader; stop AWS Security Agent so it doesn't keep charging | Owner; Claude fixes findings |
+| 2 | ✅ **The 30-day follow-up email: built.** Sent each morning when due, with a "Yes / Partly / Not yet" page | Done |
+| 3 | ✅ **The bounce and complaint check before each send: built.** Sending stops at 4% bounces or 0.08% complaints | Done |
+| 4 | ✅ **The current copy is now the real one (Option A).** Its data survives if the code is ever removed | Done |
 | 5 | **Confirm the 5 small copy choices** in `docs/copy-needed.md` (the ledger lines themselves are done) | Owner |
 | 6 | **Finish the read-through** of the wording spreadsheet (`docs/app-text.xlsx`): the confirm and manage pages, the emails and the closing screen | Owner |
 | 7 | **Open privacy questions:** a check of "The clock" thread, and whether early sign-ups need anything | Owner / adviser |
@@ -28,8 +28,8 @@ Status on 27 October 2026. ✅ done · 🔲 to do.
 
 | # | What | Who |
 |---|---|---|
-| 9 | **The bare web address.** `themondayafter.capstoneglobaladvisory.com` currently shows "Open this file from your email". It should probably show the sign-up page | Claude, a quick change |
-| 10 | **"Share this file"** currently shares that same bare address. It should share the sign-up page | Claude, a quick change |
+| 9 | ✅ **The bare web address shows the sign-up page** | Done |
+| 10 | ✅ **"Share this file" shares the sign-up page** | Done |
 | 11 | **One-click unsubscribe headers** in emails, which Gmail and Yahoo expect from newsletters | Claude |
 | 12 | **Tie the GitHub buttons to a stable `main` branch** instead of this working branch name. Then a future Claude session working on a different branch can't break Deploy | Claude prepares; owner updates one IAM setting |
 

@@ -13,6 +13,7 @@ before(() => {
   const app = new cdk.App();
   const stack = new TmaStack(app, "Test", {
     stage: "test",
+    keepData: true,
     env: { account: "111111111111", region: "eu-west-2" },
     fromAddress: "test.user@example.com",
     replyTo: "test.user@example.com",
@@ -89,8 +90,38 @@ describe("data storage", () => {
 
   it("keeps the code's logs, including the security notes, for 90 days", () => {
     const groups = Object.values(resources).filter((r) => r.Type === "AWS::Logs::LogGroup");
-    assert.equal(groups.length, 4);
+    assert.equal(groups.length, 5);
     for (const g of groups) assert.equal(g.Properties.RetentionInDays, 90);
+  });
+
+  it("keeps readers' data if the code is ever removed, and protects the database from deletion", () => {
+    const tables = Object.values(resources).filter((r) => r.Type === "AWS::DynamoDB::Table");
+    assert.equal(tables.length, 6);
+    for (const t of tables) assert.equal(t.Properties.DeletionProtectionEnabled, true);
+    const raw = template.toJSON().Resources as Record<string, { Type: string; DeletionPolicy?: string }>;
+    for (const r of Object.values(raw).filter((x) => ["AWS::DynamoDB::Table", "AWS::KMS::Key", "AWS::Logs::LogGroup"].includes(x.Type))) {
+      assert.equal(r.DeletionPolicy, "Retain", r.Type);
+    }
+  });
+
+  it("sends due follow-ups every morning, with only the access that needs", () => {
+    template.hasResourceProperties("AWS::Events::Rule", { ScheduleExpression: "cron(7 9 * * ? *)" });
+    const fn = logicalId("AWS::Lambda::Function", (p) => p.Handler === "index.followUpHandler");
+    const policies = Object.values(resources).filter((r) => r.Type === "AWS::IAM::Policy" && JSON.stringify(r.Properties.Roles).includes(fn.replace(/[0-9A-F]{8}$/, "")));
+    assert.ok(policies.length >= 1, "found the follow-up job's permissions");
+    const text = JSON.stringify(policies);
+    assert.ok(text.includes("ses:SendEmail") && text.includes("cloudwatch:GetMetricData"));
+    assert.ok(!text.includes("kms:"), "no access to the flight recorder key");
+    assert.ok(!/Recorders/.test(text), "no access to flight recorders");
+  });
+
+  it("lets only the sender and follow-up jobs read the sending health", () => {
+    const withHealth = Object.values(resources).filter((r) => r.Type === "AWS::IAM::Policy" && JSON.stringify(r.Properties).includes("cloudwatch:GetMetricData"));
+    assert.equal(withHealth.length, 2);
+  });
+
+  it("shows the sign-up page at the bare web address", () => {
+    template.hasResourceProperties("AWS::CloudFront::Distribution", { DistributionConfig: Match.objectLike({ DefaultRootObject: "signup.html" }) });
   });
 
   it("deletes exports after 7 days", () => {
@@ -163,6 +194,7 @@ describe("the website", () => {
 describe("the site's own web address", () => {
   const withAddress = (certificateArn?: string) => Template.fromStack(new TmaStack(new cdk.App(), "Addr", {
     stage: "test",
+    keepData: true,
     env: { account: "111111111111", region: "eu-west-2" },
     fromAddress: "test.user@example.com",
     replyTo: "test.user@example.com",

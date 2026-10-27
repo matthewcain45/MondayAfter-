@@ -15,7 +15,7 @@ export interface Subscriber {
   expiresAt: number; // epoch seconds; the database deletes the record after this
 }
 
-export type LinkPurpose = "confirm" | "file" | "manage";
+export type LinkPurpose = "confirm" | "file" | "manage" | "followup";
 
 export interface Link {
   tokenHash: string; // only a scrambled (hashed) version of the token is stored
@@ -32,8 +32,12 @@ export interface AnswersRecord {
   state: ReaderState;
   updatedAt: string;
   followUpDue?: string; // date the 30-day follow-up email is due, if opted in
+  followUpSentAt?: string; // when it was sent (it's only ever sent once)
+  followUpAnswer?: { answer: FollowUpAnswer; at: string }; // what the reader said
   expiresAt: number;
 }
+
+export type FollowUpAnswer = "done" | "partly" | "not-yet";
 
 export interface RecorderRecord {
   subscriberId: string;
@@ -111,6 +115,12 @@ export interface Email {
 
 export interface Mailer {
   send(email: Email): Promise<void>;
+}
+
+// Whether it's safe to send: SES's own view of the account, and the bounce and
+// complaint rates AWS watches. Rates are fractions (0.01 = 1%); null = no data yet.
+export interface SendingHealthSource {
+  read(): Promise<{ sendingEnabled: boolean; enforcement: string; bounceRate: number | null; complaintRate: number | null }>;
 }
 
 export interface Clock {

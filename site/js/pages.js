@@ -58,6 +58,35 @@
     });
   }
 
+  if (page === "followup") {
+    const token = takeToken("tma:followup");
+    const WORDS = { done: "You did it.", partly: "You did part of it.", "not-yet": "Not yet." };
+    const missing = (err) => {
+      if (err.status === 401) $("followup-missing-text").textContent = "This link has expired or isn't valid. Reply to any Monday After email if you'd like to tell us anyway.";
+      else if (err.status === 410) $("followup-missing-text").textContent = err.message;
+      else if (!err.status) $("followup-missing-text").textContent = "Couldn't reach us. Check your connection and reload this page.";
+      show("followup-missing");
+    };
+    const mark = (answer) => {
+      document.querySelectorAll("[data-answer]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.answer === answer)));
+    };
+    if (!token) show("followup-missing");
+    else post("/followup", token).then((info) => {
+      $("followup-file").textContent = "30 days ago, at the end of " + info.fileTitle + ", you chose one thing to take back.";
+      $("followup-action").textContent = info.action;
+      mark(info.answer);
+      show("followup-choose");
+    }, missing);
+    document.querySelectorAll("[data-answer]").forEach((b) => b.addEventListener("click", () => {
+      $("followup-error").textContent = "";
+      post("/followup/answer", token, { answer: b.dataset.answer }).then(() => {
+        mark(b.dataset.answer);
+        $("followup-done-text").textContent = WORDS[b.dataset.answer] + " That's saved with your answers for this file.";
+        show("followup-done");
+      }, (err) => { $("followup-error").textContent = err.status ? err.message : "Couldn't reach us. Check your connection and try again."; });
+    }));
+  }
+
   if (page === "manage") {
     const token = takeToken("tma:manage");
     const fail = (err) => { $("manage-error").textContent = err.status ? err.message : "Couldn't reach us. Check your connection and try again."; };

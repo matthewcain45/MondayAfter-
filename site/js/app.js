@@ -601,7 +601,7 @@
     const shareStatus = h("p", { class: "small", role: "status", style: "margin:0" });
 
     // Share a general link only: never the reader's personal magic link.
-    const shareUrl = location.origin + location.pathname;
+    const shareUrl = location.origin + "/signup.html"; // the sign-up page, never the reader's own link
     const share = async () => {
       const data = { title: scenario.brand + ": " + scenario.title, url: shareUrl };
       try {

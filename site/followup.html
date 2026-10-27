@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1621">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="tma-api" content="/api">
+<title>Did you do it? · The Monday After</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body data-page="followup">
+<main class="screen">
+  <div class="top"><span>The Monday After</span><span>30 days on</span></div>
+  <div class="body">
+    <section id="followup-wait" data-step>
+      <p class="intro">Checking your link…</p>
+    </section>
+    <section id="followup-choose" data-step hidden>
+      <div class="body" style="padding:0;gap:12px">
+        <h1>Did you do it?</h1>
+        <p id="followup-file" class="intro" style="font-size:.94rem">30 days ago, you chose one thing to take back.</p>
+        <div class="card">
+          <h2 class="kicker amber">You said you'd take this back</h2>
+          <p id="followup-action" class="note-line"></p>
+        </div>
+        <div class="options" role="group" aria-labelledby="followup-question">
+          <p id="followup-question" class="small" style="margin:0">Choose one. You can change it while this link works.</p>
+          <button class="btn secondary" type="button" data-answer="done">Yes, I did it</button>
+          <button class="btn secondary" type="button" data-answer="partly">Partly</button>
+          <button class="btn secondary" type="button" data-answer="not-yet">Not yet</button>
+        </div>
+        <p id="followup-error" class="error" role="alert"></p>
+      </div>
+    </section>
+    <section id="followup-done" data-step hidden>
+      <h1>Thanks.</h1>
+      <p id="followup-done-text" class="intro" style="font-size:.94rem">That's saved with your answers for this file.</p>
+    </section>
+    <section id="followup-missing" data-step hidden>
+      <h1>Use the link in your email.</h1>
+      <p id="followup-missing-text" class="intro" style="font-size:.94rem">This page opens from the link in your 30-day follow-up email.</p>
+    </section>
+  </div>
+</main>
+<script src="js/pages.js" defer></script>
+</body>
+</html>

@@ -204,3 +204,4 @@ input[type="email"] { width: 100%; min-height: 52px; padding: 12px 14px; border:
 .prose ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
 .prose b { color: var(--text); font-weight: 600; }
 .privacy .prose { max-width: 65ch; }
+.btn.secondary[aria-pressed="true"] { border-color: var(--amber); color: var(--amber); }

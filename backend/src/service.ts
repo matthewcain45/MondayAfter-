@@ -4,9 +4,10 @@
 import { noAudit, type Audit } from "./audit.ts";
 import { LIMITS, type Settings } from "./config.ts";
 import { hashForLimit, hashToken, newId, newToken, seal, unseal } from "./crypto.ts";
-import { confirmEmail, fileEmail, recorderEmail } from "./emails.ts";
+import { confirmEmail, fileEmail, followUpEmail, recorderEmail } from "./emails.ts";
+import { labels } from "./export.ts";
 import { scenarios, type Scenario } from "./scenarios.ts";
-import type { Clock, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
+import type { Clock, FollowUpAnswer, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
 import { networkForLimits } from "./edge.ts";
 import { emailForLimits, InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
 
@@ -143,6 +144,55 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
       return { sent, failed };
     },
 
+    // Runs every morning: emails readers whose 30-day follow-up is due, once each.
+    // Unsubscribed readers are skipped. Paused readers still get it: they asked for it.
+    async sendFollowUps(options: { pauseMs?: number; asOf?: Date } = {}): Promise<{ sent: number; failed: number }> {
+      const today = (options.asOf || clock.now()).toISOString().slice(0, 10);
+      const due = (await store.listAnswers()).filter((a) => a.followUpDue && a.followUpDue <= today && !a.followUpSentAt);
+      let sent = 0;
+      let failed = 0;
+      for (const a of due) {
+        const scenario = scenarios[a.scenarioId];
+        const tb = a.state.takeBack;
+        const subscriber = await store.getSubscriber(a.subscriberId);
+        if (!scenario || !tb || !("item" in tb) || !tb.item || !tb.followUp || subscriber?.status !== "confirmed") continue;
+        try {
+          const token = await issueLink("followup", subscriber.id, LIMITS.followUpLinkSeconds, scenario.id);
+          const action = labels(scenario).takeBack(tb.item);
+          await mailer.send(followUpEmail(subscriber.email, scenario.title, action, urlFor("followup.html", token), await manageUrl(subscriber.id)));
+          await store.putAnswers({ ...a, followUpSentAt: nowIso() });
+          await store.putEvent({ subscriberId: subscriber.id, scenarioId: scenario.id, at: nowIso(), name: "followup-sent", expiresAt: epoch(LIMITS.retentionSeconds) });
+          audit("followup-sent", { subscriberId: subscriber.id, scenarioId: scenario.id });
+          sent++;
+        } catch {
+          failed++;
+        }
+        if (options.pauseMs) await new Promise((res) => setTimeout(res, options.pauseMs));
+      }
+      return { sent, failed };
+    },
+
+    // What the follow-up page shows: the file, the action, and any answer already given.
+    async followUpStatus(token: unknown): Promise<{ fileTitle: string; action: string; answer: FollowUpAnswer | null }> {
+      const { link, subscriber } = await resolve(token, "followup");
+      const scenario = link.scenarioId ? scenarios[link.scenarioId] : undefined;
+      const record = scenario ? await store.getAnswers(subscriber.id, scenario.id) : undefined;
+      const tb = record?.state.takeBack;
+      if (!scenario || !record || !tb || !("item" in tb) || !tb.item) throw new ApiError(410, "There's nothing to answer for this file any more.");
+      return { fileTitle: scenario.title, action: labels(scenario).takeBack(tb.item), answer: record.followUpAnswer?.answer ?? null };
+    },
+
+    async answerFollowUp(token: unknown, raw: unknown): Promise<{ ok: true }> {
+      const { link, subscriber } = await resolve(token, "followup");
+      const answer = (raw && typeof raw === "object" ? (raw as { answer?: unknown }).answer : undefined) as FollowUpAnswer;
+      if (!["done", "partly", "not-yet"].includes(answer)) throw new ApiError(400, "Please choose one of the answers.");
+      const record = link.scenarioId ? await store.getAnswers(subscriber.id, link.scenarioId) : undefined;
+      if (!record) throw new ApiError(410, "There's nothing to answer for this file any more.");
+      await store.putAnswers({ ...record, followUpAnswer: { answer, at: nowIso() } });
+      audit("followup-answered", { subscriberId: subscriber.id, scenarioId: record.scenarioId });
+      return { ok: true };
+    },
+
     // Creates one reader's personal link for a file.
     async issueFileLink(subscriberId: string, scenarioId: string): Promise<string> {
       if (!scenarios[scenarioId]) throw new Error("Unknown scenario " + scenarioId);
@@ -166,7 +216,12 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
       const tb = state.takeBack;
       const due = tb && "item" in tb && tb.item && tb.followUp && tb.savedAt && !tb.draft ? Date.parse(tb.savedAt) + 30 * 86400 * 1000 : NaN;
       const followUpDue = Number.isFinite(due) ? new Date(due).toISOString().slice(0, 10) : undefined;
-      await store.putAnswers({ subscriberId: subscriber.id, scenarioId: scenario.id, state, updatedAt: nowIso(), followUpDue, expiresAt: epoch(LIMITS.retentionSeconds) });
+      // Keep the follow-up's history: it's sent once, and the reader's answer stays.
+      const before = await store.getAnswers(subscriber.id, scenario.id);
+      await store.putAnswers({
+        subscriberId: subscriber.id, scenarioId: scenario.id, state, updatedAt: nowIso(), followUpDue,
+        followUpSentAt: before?.followUpSentAt, followUpAnswer: before?.followUpAnswer, expiresAt: epoch(LIMITS.retentionSeconds),
+      });
       return { ok: true };
     },
 

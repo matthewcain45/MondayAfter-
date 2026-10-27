@@ -4,6 +4,8 @@
 import { scenarios, type Scenario } from "./scenarios.ts";
 import type { AnswersRecord, EventRecord, Store, Subscriber } from "./types.ts";
 
+const FOLLOW_UP_WORDS = { done: "Yes", partly: "Partly", "not-yet": "Not yet" } as const;
+
 const text = (v: unknown): string => (v && typeof v === "object" && "todo" in v ? "[" + String((v as { todo: string }).todo) + "]" : String(v ?? ""));
 
 // Spreadsheet programs run cells starting with = + - @ as formulas, so those
@@ -15,7 +17,7 @@ function cell(v: unknown): string {
 }
 export const toCsv = (rows: unknown[][]): string => rows.map((r) => r.map(cell).join(",")).join("\r\n") + "\r\n";
 
-function labels(sc: Scenario) {
+export function labels(sc: Scenario) {
   const screen = (id: string) => sc.screens.find((s) => s.id === id);
   const option = (screenId: string, optId: string) => screen(screenId)?.options?.find((o) => o.id === optId);
   const ledger = sc.screens.find((s) => s.type === "ledger") as unknown as { rows: { id: string; dimension: string; takeBack?: { label: unknown } }[] } | undefined;
@@ -58,6 +60,7 @@ function answerRows(sc: Scenario, a: AnswersRecord): [string, string][] {
     const when = tbScreen?.whenOptions?.find((w) => w.id === tb.when)?.label ?? tb.when;
     out.push(["Take one thing back", L.takeBack(tb.item) + " (by " + when + ")"]);
     out.push(["30-day follow-up", tb.followUp ? "Yes" : "No"]);
+    if (a.followUpSentAt) out.push(["Done at 30 days", a.followUpAnswer ? FOLLOW_UP_WORDS[a.followUpAnswer.answer] : "No answer yet"]);
   } else out.push(["Take one thing back", tb && "skipped" in tb ? "Skipped" : "Not reached"]);
   out.push(["File closed", s.closed ? "Yes" : "No"]);
   return out;
@@ -137,6 +140,11 @@ export function summaryCsv(sc: Scenario, events: EventRecord[], answers: Answers
   rows.push(["Chose one thing to take back", tookBack, pct(tookBack), ""]);
   const followUps = answers.filter((a) => a.scenarioId === sc.id && a.followUpDue).length;
   rows.push(["Asked for the 30-day follow-up", followUps, pct(followUps), ""]);
+  const fileAnswers = answers.filter((a) => a.scenarioId === sc.id);
+  rows.push(["30-day follow-up emails sent", fileAnswers.filter((a) => a.followUpSentAt).length, "", ""]);
+  for (const [id, words] of Object.entries(FOLLOW_UP_WORDS)) {
+    rows.push(["Done at 30 days: " + words, fileAnswers.filter((a) => a.followUpAnswer?.answer === id).length, "", ""]);
+  }
   const shared = who((e) => e.name === "share");
   rows.push(["Shared the file", shared, pct(shared), ""]);
   return toCsv(rows);

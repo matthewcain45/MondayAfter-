@@ -6,6 +6,7 @@
 // Test-only helpers (never deployed) live under /dev/:
 //   /dev/            outbox of emails "sent", with clickable links
 //   /dev/send-file   send Incident File 01 to every confirmed reader
+//   /dev/follow-ups  send the 30-day follow-ups as if 31 days had passed
 //   /dev/export      the owner's spreadsheets (CSV)
 
 import { createServer } from "node:http";
@@ -43,7 +44,7 @@ const mailerRouter = createRouter(recorderMailer, ["emailRecorder"]);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const devPage = (title, body) => `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>body{font:15px/1.5 system-ui;margin:0;padding:16px;max-width:760px;background:#0E1621;color:#E8EDF3}a{color:#FFB020}pre{white-space:pre-wrap;background:#17212F;padding:12px;border-radius:10px;overflow-x:auto}h1{font-size:20px}</style>
-<p><a href="/dev/">Outbox</a> · <a href="/dev/send-file">Send Incident File 01</a> · <a href="/dev/export">Export</a> · <a href="/signup.html">Sign-up page</a></p>${body}`;
+<p><a href="/dev/">Outbox</a> · <a href="/dev/send-file">Send Incident File 01</a> · <a href="/dev/follow-ups">Send 30-day follow-ups</a> · <a href="/dev/export">Export</a> · <a href="/signup.html">Sign-up page</a></p>${body}`;
 
 async function dev(path, res) {
   const html = (title, body) => res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(devPage(title, body));
@@ -56,6 +57,10 @@ async function dev(path, res) {
     // Same code as the "Send Incident File" button on AWS.
     const { sent, failed } = await api.sendFile("incident-file-01");
     return html("Sent", `<p>Sent Incident File 01 to ${sent} confirmed reader(s)${failed ? `, ${failed} failed` : ""}. <a href="/dev/">See the outbox</a>.</p>`);
+  }
+  if (path === "/dev/follow-ups") {
+    const { sent, failed } = await api.sendFollowUps({ asOf: new Date(Date.now() + 31 * 86400 * 1000) });
+    return html("Follow-ups", `<p>Sent ${sent} follow-up(s), as if 31 days had passed${failed ? `, ${failed} failed` : ""}. <a href="/dev/">See the outbox</a>.</p>`);
   }
   if (path === "/dev/export") {
     const files = await buildExport(store);

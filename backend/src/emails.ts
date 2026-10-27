@@ -74,3 +74,22 @@ export function recorderEmail(to: string, brand: string, fileTitle: string, save
     ].join("\n"),
   };
 }
+
+// The 30-day follow-up, sent once, only to readers who ticked "Ask me in 30 days".
+export function followUpEmail(to: string, fileTitle: string, action: string, answerUrl: string, manageUrl: string): Email {
+  return {
+    to,
+    subject: "Did you do it? " + fileTitle,
+    text: [
+      "30 days ago, at the end of " + fileTitle + ", you chose one thing to take back:",
+      "",
+      action,
+      "",
+      "Did you do it? Tell us with one tap:",
+      answerUrl,
+      "",
+      "Your answer is kept with your other answers for this file. This is the only reminder we'll send about it.",
+      footer(manageUrl),
+    ].join("\n"),
+  };
+}

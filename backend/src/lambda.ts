@@ -3,14 +3,16 @@
 //   recorderMailer - only "email me my flight recorder"; the one place allowed to unlock
 //   exporter       - builds the owner's spreadsheets into a private storage bucket; can't read recorders
 //   sender         - the "Send Incident File" button: emails each confirmed reader their personal link
+//   followUp       - every morning: the 30-day follow-up emails that are due
 
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
-import { dynamoStore, kmsKeys, sesMailer } from "./adapters/aws.ts";
+import { dynamoStore, kmsKeys, sesHealth, sesMailer } from "./adapters/aws.ts";
 import { consoleAudit } from "./audit.ts";
 import { cameThroughCloudFront, visitorAddress } from "./edge.ts";
 import { buildExport } from "./export.ts";
 import { createRouter, ROUTES, type Request } from "./http.ts";
+import { checkSendingHealth, describeRate } from "./reputation.ts";
 import { createService } from "./service.ts";
 
 interface HttpEvent {
@@ -80,18 +82,39 @@ export const recorderMailerHandler = async (event: HttpEvent) => (await (mailer 
 // Which GitHub run pressed the button, for the security notes. Digits only.
 const runOf = (event: { requestedBy?: unknown }) => (typeof event.requestedBy === "string" && /^\d{1,20}$/.test(event.requestedBy) ? event.requestedBy : "unknown");
 
+const senderService = async () => createService({
+  store: store(),
+  keys: { generateDataKey: () => Promise.reject(new Error("The sender never handles flight recorders")) },
+  mailer: sesMailer(env("FROM_ADDRESS"), env("REPLY_TO")),
+  clock: { now: () => new Date() },
+  settings: { siteUrl: await siteUrl(), brand: "The Monday After" },
+  audit: consoleAudit,
+});
+
+// Checks bounce and complaint rates first; sends nothing if they're too high.
+async function healthFirst(what: string) {
+  const health = await checkSendingHealth(sesHealth());
+  const rates = { bounceRate: describeRate(health.bounceRate), complaintRate: describeRate(health.complaintRate) };
+  if (!health.ok) consoleAudit("send-blocked", { what, reasons: health.reasons.join(" "), ...rates });
+  return { ...health, ...rates };
+}
+
 export const sendFileHandler = async (event: { scenarioId?: string; requestedBy?: unknown }) => {
-  const svc = createService({
-    store: store(),
-    keys: { generateDataKey: () => Promise.reject(new Error("The sender never handles flight recorders")) },
-    mailer: sesMailer(env("FROM_ADDRESS"), env("REPLY_TO")),
-    clock: { now: () => new Date() },
-    settings: { siteUrl: await siteUrl(), brand: "The Monday After" },
-  });
   const scenarioId = String(event.scenarioId || "");
   consoleAudit("send-started", { scenarioId: /^[a-z0-9-]{1,60}$/.test(scenarioId) ? scenarioId : "invalid", githubRun: runOf(event) });
-  const result = await svc.sendFile(scenarioId, { pauseMs: 1100 });
+  const health = await healthFirst("file");
+  if (!health.ok) return { blocked: true, reasons: health.reasons, bounceRate: health.bounceRate, complaintRate: health.complaintRate };
+  const result = await (await senderService()).sendFile(scenarioId, { pauseMs: 1100 });
   consoleAudit("send-finished", { scenarioId, sent: result.sent, failed: result.failed, githubRun: runOf(event) });
+  return { ...result, bounceRate: health.bounceRate, complaintRate: health.complaintRate };
+};
+
+// Runs every morning on a schedule: the 30-day follow-up emails that are due.
+export const followUpHandler = async () => {
+  const health = await healthFirst("follow-ups");
+  if (!health.ok) return { blocked: true, reasons: health.reasons }; // they wait until sending is healthy again
+  const result = await (await senderService()).sendFollowUps({ pauseMs: 1100 });
+  consoleAudit("followups-finished", { sent: result.sent, failed: result.failed });
   return result;
 };
 
