@@ -7,6 +7,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { GetParameterCommand, SSMClient } from "@aws-sdk/client-ssm";
 import { dynamoStore, kmsKeys, sesMailer } from "./adapters/aws.ts";
+import { consoleAudit } from "./audit.ts";
 import { cameThroughCloudFront, visitorAddress } from "./edge.ts";
 import { buildExport } from "./export.ts";
 import { createRouter, ROUTES, type Request } from "./http.ts";
@@ -45,8 +46,9 @@ async function build(canDecrypt: boolean, routes: string[]) {
     mailer: sesMailer(env("FROM_ADDRESS"), env("REPLY_TO")),
     clock: { now: () => new Date() },
     settings: { siteUrl: await siteUrl(), brand: "The Monday After" },
+    audit: consoleAudit,
   });
-  const handle = createRouter(svc, routes);
+  const handle = createRouter(svc, routes, consoleAudit);
   return async (event: HttpEvent) => {
     const headers: Record<string, string | undefined> = {};
     for (const [k, v] of Object.entries(event.headers || {})) headers[k.toLowerCase()] = v;
@@ -75,7 +77,10 @@ export const recorderMailerHandler = async (event: HttpEvent) => (await (mailer 
 
 // Run on request (the "Send Incident File" button). Logs counts only, never addresses.
 // SES allows about one email a second at first, so it sends one at a time.
-export const sendFileHandler = async (event: { scenarioId?: string }) => {
+// Which GitHub run pressed the button, for the security notes. Digits only.
+const runOf = (event: { requestedBy?: unknown }) => (typeof event.requestedBy === "string" && /^\d{1,20}$/.test(event.requestedBy) ? event.requestedBy : "unknown");
+
+export const sendFileHandler = async (event: { scenarioId?: string; requestedBy?: unknown }) => {
   const svc = createService({
     store: store(),
     keys: { generateDataKey: () => Promise.reject(new Error("The sender never handles flight recorders")) },
@@ -83,19 +88,23 @@ export const sendFileHandler = async (event: { scenarioId?: string }) => {
     clock: { now: () => new Date() },
     settings: { siteUrl: await siteUrl(), brand: "The Monday After" },
   });
-  const result = await svc.sendFile(String(event.scenarioId || ""), { pauseMs: 1100 });
-  console.log("Send finished", JSON.stringify(result));
+  const scenarioId = String(event.scenarioId || "");
+  consoleAudit("send-started", { scenarioId: /^[a-z0-9-]{1,60}$/.test(scenarioId) ? scenarioId : "invalid", githubRun: runOf(event) });
+  const result = await svc.sendFile(scenarioId, { pauseMs: 1100 });
+  consoleAudit("send-finished", { scenarioId, sent: result.sent, failed: result.failed, githubRun: runOf(event) });
   return result;
 };
 
 // Run on request (the "Export spreadsheets" button). Files land in a private
 // bucket, in a folder named by date and time, and are deleted after 7 days.
-export const exportHandler = async () => {
-  const files = await buildExport(store());
+export const exportHandler = async (event: { requestedBy?: unknown } = {}) => {
   const folder = new Date().toISOString().replace(/[:.]/g, "-");
+  consoleAudit("export-started", { folder, githubRun: runOf(event) });
+  const files = await buildExport(store());
   const s3 = new S3Client({});
   for (const [name, csv] of Object.entries(files)) {
     await s3.send(new PutObjectCommand({ Bucket: env("EXPORT_BUCKET"), Key: `${folder}/${name}`, Body: "\uFEFF" + csv /* marks the file as UTF-8 for Excel */, ContentType: "text/csv; charset=utf-8" }));
   }
+  consoleAudit("export-finished", { folder, files: Object.keys(files).length, githubRun: runOf(event) });
   return { folder, files: Object.keys(files) };
 };

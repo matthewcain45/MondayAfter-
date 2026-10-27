@@ -103,7 +103,37 @@
 - **Least privilege:**
   - Each part of the backend can only touch what it needs.
   - Automated tests check that the API can't unlock recorders, and that the export and sender can't read them.
-- **Logs** hold only errors: no request bodies, email addresses or links.
+- **Logs** hold errors and short security notes (see below): no request bodies, email addresses, links or internet addresses.
 - **Libraries:** `npm audit` found no known vulnerabilities, and every version is pinned.
 - **No secrets in the project:** a scan found no keys or passwords. GitHub reaches AWS with short-lived passes tied to this project's permanent IDs and branch.
 - **Email:** the domain signs every email (DKIM), the bounce address is set up, DMARC is in monitor mode, and sign-ups need confirming.
+
+## AWS Continuum code review (27 October 2026)
+
+Four findings, all accepted by the owner and fixed.
+
+1. **Odd saved data caused a crash (low).**
+   - What was happening: a signed-in reader could send strange data that produced "Something went wrong" instead of a polite refusal. Examples were a thread called `constructor`, a date in the year 275,760, or data nested too deeply to measure.
+   - Fixed by:
+     - checking thread names against the real list
+     - accepting only normal-format dates between 2020 and 2100
+     - checking that take-back items and flags exist in the scenario
+     - treating unmeasurable data as too big
+     - making the follow-up date calculation unable to fail
+2. **Sign-up limits could be dodged to flood one inbox.**
+   - What was happening: the limits counted `alex+1@…`, `alex+2@…` and dotted Gmail addresses separately, and each IPv6 address separately.
+   - Fixed by:
+     - counting all variations of an address as one for the limit
+     - counting a whole IPv6 block (`/64`, usually one home or phone) as one visitor
+   - Unchanged: IPv4 addresses are still counted one by one, so an office isn't lumped together. The address is still stored and emailed exactly as typed. If a victim marks a confirmation email as spam, the SES account-level suppression list stops further mail to them.
+3. **No record of security events (findings 3 and 4).**
+   - What was added: short security notes in the Lambda logs (`backend/src/audit.ts`), kept **90 days** (previously 1 month). Each note holds only fixed words and internal IDs, never an email, link, internet address or anything typed. A note is recorded for:
+     - each refused link, with the reason
+     - each "too many requests" block, and each sign-up refused by a limit
+     - each refused request (route and status only)
+     - the hidden trap field being filled
+     - sign-up, confirm, pause, resume, unsubscribe and delete
+     - a flight recorder being saved or emailed
+     - each Send and Export button press, with its GitHub run number
+   - **Deliberately not added:** CloudFront, API Gateway and S3 access logs. They would record every visitor's internet address on every page, which is far more personal data than a 50-reader newsletter needs. AWS's own CloudTrail event history already keeps 90 days of account changes for free.
+   - **Still open:** keeping logs and data if the system is ever removed is part of launch checklist item 4.

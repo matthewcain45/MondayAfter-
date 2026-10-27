@@ -125,7 +125,7 @@ export class TmaStack extends cdk.Stack {
       ...extra,
       functionName: `tma-${stage}-${name.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase()}`,
       handler,
-      logGroup: new logs.LogGroup(this, name + "Logs", { retention: logs.RetentionDays.ONE_MONTH, removalPolicy: cdk.RemovalPolicy.DESTROY }),
+      logGroup: new logs.LogGroup(this, name + "Logs", { retention: logs.RetentionDays.THREE_MONTHS, removalPolicy: cdk.RemovalPolicy.DESTROY }),
     });
 
     const apiFn = fn("Api", "apiHandler");

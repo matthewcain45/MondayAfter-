@@ -21,8 +21,11 @@ jobs:
           aws-region: eu-west-2
 
       - name: Build the spreadsheets
+        env:
+          RUN_ID: ${{ github.run_id }}
         run: |
-          aws lambda invoke --function-name tma-test-export --cli-read-timeout 90 result.json > /dev/null
+          aws lambda invoke --function-name tma-test-export --cli-read-timeout 90 \
+            --cli-binary-format raw-in-base64-out --payload "{\"requestedBy\":\"$RUN_ID\"}" result.json > /dev/null
           folder=$(node -e 'console.log(require("./result.json").folder || "")')
           bucket=$(aws cloudformation describe-stacks --stack-name TheMondayAfter-test --query "Stacks[0].Outputs[?OutputKey=='ExportBucketName'].OutputValue" --output text)
           if [ -z "$folder" ]; then echo "Export failed"; cat result.json; exit 1; fi

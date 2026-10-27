@@ -1,12 +1,14 @@
 // What the backend actually does: sign-up, confirming, opening a magic link,
 // saving answers and the flight recorder, analytics, unsubscribe and delete.
 
+import { noAudit, type Audit } from "./audit.ts";
 import { LIMITS, type Settings } from "./config.ts";
 import { hashForLimit, hashToken, newId, newToken, seal, unseal } from "./crypto.ts";
 import { confirmEmail, fileEmail, recorderEmail } from "./emails.ts";
 import { scenarios, type Scenario } from "./scenarios.ts";
 import type { Clock, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
-import { InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
+import { networkForLimits } from "./edge.ts";
+import { emailForLimits, InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
 
 export class ApiError extends Error {
   status: number;
@@ -29,9 +31,10 @@ export interface Deps {
   mailer: Mailer;
   clock: Clock;
   settings: Settings;
+  audit?: Audit;
 }
 
-export function createService({ store, keys, mailer, clock, settings }: Deps) {
+export function createService({ store, keys, mailer, clock, settings, audit = noAudit }: Deps) {
   const nowIso = () => clock.now().toISOString();
   const epoch = (plusSeconds: number) => Math.floor(clock.now().getTime() / 1000) + plusSeconds;
 
@@ -44,21 +47,36 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
   const urlFor = (page: string, token: string) => `${settings.siteUrl}/${page}#t=${token}`;
   const manageUrl = async (subscriberId: string) => urlFor("manage.html", await issueLink("manage", subscriberId, LIMITS.manageLinkSeconds));
 
+  function limited(limit: string, subscriberId: string | undefined, message: string): never {
+    audit("rate-limited", { limit, subscriberId });
+    throw new ApiError(429, message);
+  }
+
   async function resolve(token: unknown, purpose: LinkPurpose): Promise<{ link: Link; subscriber: Subscriber }> {
-    if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) throw new ApiError(401, EXPIRED);
-    const tokenHash = hashToken(token);
+    // Readers always see the same message; the note records the real reason.
+    const refuse = (reason: string, subscriberId?: string): never => {
+      audit("link-refused", { purpose, reason, subscriberId });
+      throw new ApiError(401, EXPIRED);
+    };
+    if (typeof token !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(token)) refuse(token === undefined ? "missing" : "bad-format");
+    const tokenHash = hashToken(token as string);
     const link = await store.getLink(tokenHash);
-    if (!link || link.purpose !== purpose || link.expiresAt < epoch(0)) throw new ApiError(401, EXPIRED);
-    if ((await store.hit("link:" + tokenHash, 3600)) > LIMITS.requestsPerLinkPerHour) throw new ApiError(429, SLOW_DOWN);
+    if (!link) return refuse("unknown");
+    if (link.purpose !== purpose) refuse("wrong-purpose", link.subscriberId);
+    if (link.expiresAt < epoch(0)) refuse("expired", link.subscriberId);
+    if ((await store.hit("link:" + tokenHash, 3600)) > LIMITS.requestsPerLinkPerHour) limited("link", link.subscriberId, SLOW_DOWN);
     const subscriber = await store.getSubscriber(link.subscriberId);
-    if (!subscriber) throw new ApiError(401, EXPIRED);
+    if (!subscriber) return refuse("no-subscriber", link.subscriberId);
     return { link, subscriber };
   }
 
   async function resolveFile(token: unknown): Promise<{ link: Link; subscriber: Subscriber; scenario: Scenario }> {
     const found = await resolve(token, "file");
     const scenario = found.link.scenarioId ? scenarios[found.link.scenarioId] : undefined;
-    if (!scenario) throw new ApiError(401, EXPIRED);
+    if (!scenario) {
+      audit("link-refused", { purpose: "file", reason: "unknown-file", subscriberId: found.subscriber.id });
+      throw new ApiError(401, EXPIRED);
+    }
     return { ...found, scenario };
   }
 
@@ -70,11 +88,17 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
   return {
     // Same reply whatever happens, so the form can't be used to find out who is subscribed.
     async signup(input: { email?: unknown; website?: unknown; ip: string }): Promise<{ ok: true }> {
-      if (typeof input.website === "string" && input.website.trim() !== "") return { ok: true }; // a bot filled the hidden trap field
-      if ((await store.hit("signup-ip:" + hashForLimit(input.ip), 3600)) > LIMITS.signupsPerIpPerHour) throw new ApiError(429, SLOW_DOWN);
+      if (typeof input.website === "string" && input.website.trim() !== "") {
+        audit("signup-trap");
+        return { ok: true }; // a bot filled the hidden trap field
+      }
+      if ((await store.hit("signup-ip:" + hashForLimit(networkForLimits(input.ip)), 3600)) > LIMITS.signupsPerIpPerHour) limited("signup-visitor", undefined, SLOW_DOWN);
       const email = wrapInvalid(() => validateEmail(input.email));
-      if ((await store.hit("signup-everyone", 3600)) > LIMITS.signupsPerHourEveryone) throw new ApiError(429, BUSY);
-      if ((await store.hit("signup-email:" + hashForLimit(email), 86400)) > LIMITS.signupsPerEmailPerDay) return { ok: true };
+      if ((await store.hit("signup-everyone", 3600)) > LIMITS.signupsPerHourEveryone) limited("signup-everyone", undefined, BUSY);
+      if ((await store.hit("signup-email:" + hashForLimit(emailForLimits(email)), 86400)) > LIMITS.signupsPerEmailPerDay) {
+        audit("rate-limited", { limit: "signup-address" });
+        return { ok: true }; // same reply as always, so the form can't reveal anything
+      }
 
       let subscriber = await store.findSubscriberByEmail(email);
       if (subscriber?.status === "confirmed") return { ok: true };
@@ -84,6 +108,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       }
       const token = await issueLink("confirm", subscriber.id, LIMITS.confirmLinkSeconds);
       await mailer.send(confirmEmail(email, settings.brand, urlFor("confirm.html", token)));
+      audit("signup", { subscriberId: subscriber.id });
       return { ok: true };
     },
 
@@ -91,6 +116,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       const { link, subscriber } = await resolve(token, "confirm");
       await store.putSubscriber({ ...subscriber, status: "confirmed", confirmedAt: nowIso(), unsubscribedAt: undefined, expiresAt: epoch(LIMITS.retentionSeconds) });
       await store.deleteLink(link.tokenHash);
+      audit("confirmed", { subscriberId: subscriber.id });
       return { ok: true };
     },
 
@@ -138,9 +164,8 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       const { subscriber, scenario } = await resolveFile(token);
       const state: ReaderState = wrapInvalid(() => validateState(raw, scenario));
       const tb = state.takeBack;
-      const followUpDue = tb && "item" in tb && tb.item && tb.followUp && tb.savedAt && !tb.draft
-        ? new Date(Date.parse(tb.savedAt) + 30 * 86400 * 1000).toISOString().slice(0, 10)
-        : undefined;
+      const due = tb && "item" in tb && tb.item && tb.followUp && tb.savedAt && !tb.draft ? Date.parse(tb.savedAt) + 30 * 86400 * 1000 : NaN;
+      const followUpDue = Number.isFinite(due) ? new Date(due).toISOString().slice(0, 10) : undefined;
       await store.putAnswers({ subscriberId: subscriber.id, scenarioId: scenario.id, state, updatedAt: nowIso(), followUpDue, expiresAt: epoch(LIMITS.retentionSeconds) });
       return { ok: true };
     },
@@ -152,6 +177,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       const context = { subscriberId: subscriber.id, scenarioId: scenario.id, purpose: "flight-recorder" };
       const savedAt = nowIso();
       await store.putRecorder({ subscriberId: subscriber.id, scenarioId: scenario.id, sealed: await seal(keys, JSON.stringify(entries), context), savedAt, expiresAt: epoch(LIMITS.retentionSeconds) });
+      audit("recorder-saved", { subscriberId: subscriber.id, scenarioId: scenario.id });
       return { savedAt };
     },
 
@@ -159,13 +185,14 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
     // it to the reader's own email address.
     async emailRecorder(token: unknown): Promise<{ ok: true }> {
       const { subscriber, scenario } = await resolveFile(token);
-      if ((await store.hit("recorder-email:" + hashForLimit(subscriber.id), 86400)) > LIMITS.recorderEmailsPerDay) throw new ApiError(429, SLOW_DOWN);
+      if ((await store.hit("recorder-email:" + hashForLimit(subscriber.id), 86400)) > LIMITS.recorderEmailsPerDay) limited("recorder-email", subscriber.id, SLOW_DOWN);
       const rec = await store.getRecorder(subscriber.id, scenario.id);
       if (!rec) throw new ApiError(409, "There's no saved flight recorder for this file."); // not 404: CloudFront swaps 404s for its "page not found" page
       const context = { subscriberId: subscriber.id, scenarioId: scenario.id, purpose: "flight-recorder" };
       const entries = JSON.parse(await unseal(keys, rec.sealed, context)) as Record<string, string>;
       const labels = recorderFields(scenario).map((f) => ({ label: f.label.split("·")[0].trim(), text: entries[f.id] || "" }));
       await mailer.send(recorderEmail(subscriber.email, settings.brand, scenario.title, rec.savedAt, labels, await manageUrl(subscriber.id)));
+      audit("recorder-emailed", { subscriberId: subscriber.id, scenarioId: scenario.id });
       return { ok: true };
     },
 
@@ -192,18 +219,21 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       if (subscriber.status === "unsubscribed") throw new ApiError(409, "You're unsubscribed, so there's nothing to pause.");
       const pausedUntil = new Date(clock.now().getTime() + LIMITS.pauseSeconds * 1000).toISOString();
       await store.putSubscriber({ ...subscriber, pausedUntil });
+      audit("paused", { subscriberId: subscriber.id });
       return { pausedUntil };
     },
 
     async resume(token: unknown): Promise<{ ok: true }> {
       const { subscriber } = await resolve(token, "manage");
       await store.putSubscriber({ ...subscriber, pausedUntil: undefined });
+      audit("resumed", { subscriberId: subscriber.id });
       return { ok: true };
     },
 
     async unsubscribe(token: unknown): Promise<{ ok: true }> {
       const { subscriber } = await resolve(token, "manage");
       if (subscriber.status !== "unsubscribed") await store.putSubscriber({ ...subscriber, status: "unsubscribed", unsubscribedAt: nowIso() });
+      audit("unsubscribed", { subscriberId: subscriber.id });
       return { ok: true };
     },
 
@@ -215,6 +245,7 @@ export function createService({ store, keys, mailer, clock, settings }: Deps) {
       await store.deleteEventsFor(subscriber.id);
       await store.deleteLinksFor(subscriber.id);
       await store.deleteSubscriber(subscriber.id);
+      audit("deleted", { subscriberId: subscriber.id }); // kept 90 days as a record that it was done
       return { ok: true };
     },
   };

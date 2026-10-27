@@ -37,10 +37,11 @@ jobs:
       - name: Send
         env:
           FILE_ID: ${{ github.event.inputs.file }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           case "$FILE_ID" in *[!a-z0-9-]*|"") echo "Bad file name"; exit 1;; esac
           aws lambda invoke --function-name tma-test-sender --cli-read-timeout 320 \
-            --cli-binary-format raw-in-base64-out --payload "{\"scenarioId\":\"$FILE_ID\"}" result.json > /dev/null
+            --cli-binary-format raw-in-base64-out --payload "{\"scenarioId\":\"$FILE_ID\",\"requestedBy\":\"$RUN_ID\"}" result.json > /dev/null
           node -e '
             const r = require("./result.json");
             if (typeof r.sent !== "number") { console.error("Send failed:", JSON.stringify(r)); process.exit(1); }

@@ -87,6 +87,12 @@ describe("data storage", () => {
     });
   });
 
+  it("keeps the code's logs, including the security notes, for 90 days", () => {
+    const groups = Object.values(resources).filter((r) => r.Type === "AWS::Logs::LogGroup");
+    assert.equal(groups.length, 4);
+    for (const g of groups) assert.equal(g.Properties.RetentionInDays, 90);
+  });
+
   it("deletes exports after 7 days", () => {
     template.hasResourceProperties("AWS::S3::Bucket", { LifecycleConfiguration: { Rules: [Match.objectLike({ ExpirationInDays: 7, Status: "Enabled" })] } });
   });

@@ -1,6 +1,7 @@
 // Turns web requests into service calls. Personal links travel in our own
 // "X-TMA-Link" header, never in the web address, so they don't end up in logs.
 
+import { noAudit, type Audit } from "./audit.ts";
 import { ApiError, type Service } from "./service.ts";
 
 export interface Request {
@@ -46,7 +47,7 @@ function reply(status: number, data: unknown): Response {
 
 // `allowed` lists the routes this deployment answers. The flight recorder
 // mailer runs separately from everything else so only it can unlock recorders.
-export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTES)) {
+export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTES), audit: Audit = noAudit) {
   const routes = allowed.map((name) => ROUTES[name]);
 
   return async function handle(req: Request): Promise<Response> {
@@ -66,7 +67,11 @@ export function createRouter(svc: Service, allowed: string[] = Object.keys(ROUTE
       const token = req.headers["x-tma-link"]?.trim() || undefined;
       return reply(200, await route.run(svc, token, body, req));
     } catch (e) {
-      if (e instanceof ApiError) return reply(e.status, { error: e.message });
+      if (e instanceof ApiError) {
+        // The route and status only: the message can echo part of what was sent.
+        audit("request-refused", { method: req.method, path: req.path, status: e.status });
+        return reply(e.status, { error: e.message });
+      }
       // Log the route and error only: never request bodies, emails or tokens.
       console.error("Request failed", req.method, req.path, e instanceof Error ? e.message : "unknown error");
       return reply(500, { error: "Something went wrong. Please try again." });

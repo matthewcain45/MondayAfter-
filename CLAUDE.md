@@ -152,4 +152,5 @@ Agreed with the project owner. Changing any of these is an "ask first" decision.
 - Personal links travel in the `#t=` part of the address, which browsers don't send to servers. They are removed from the address bar straight away, and are sent to the backend only in the `X-TMA-Link` header. Never put them in query strings or logs.
 - "Share this file" shares a general link, never the reader's personal link.
 - Flight recorder text goes only to `PUT /api/file/recorder`, and is encrypted there. Never put it in saved state, `track()`, logs or exports. The browser doesn't keep it in live mode.
-- Never log request bodies, email addresses or tokens.
+- Never log request bodies, email addresses, tokens or internet addresses. Security notes go through `audit()` (`backend/src/audit.ts`) with fixed words and internal IDs only, and are kept 90 days (owner's decision, 27 October 2026). The privacy notice describes them.
+- Sign-up limits use `emailForLimits()` (ignores `+tags` and Gmail dots) and `networkForLimits()` (a whole IPv6 `/64` counts as one visitor; IPv4 stays whole). Both were approved on 27 October 2026.

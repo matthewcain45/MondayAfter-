@@ -18,9 +18,10 @@ A free monthly email for aspiring CIOs. Each email holds a personal, expiring li
 | Flight recorder (free text about what the reader would do) | Emailed back to the reader on request | 2 years | AWS, London, encrypted with a dedicated key that the main application cannot decrypt; never exported or logged |
 | Subscription status (signed up, confirmed, paused until, unsubscribed) | Running the service | 2 years | AWS, London |
 | Hashed IP address and hashed email address | Rate limiting against abuse | Up to 1 hour (IP) and up to 1 day (email) | AWS, London |
+| Security notes (refused links, blocked requests, confirm/pause/resume/unsubscribe/delete, button presses) with an internal ID only | Detecting and investigating misuse; evidence that a deletion was carried out | 90 days | AWS, London |
 | Replies to our emails | Answering questions | Until deleted by the owner | Google Workspace |
 
-- **Not processed:** no cookies, tracking pixels, email open tracking, advertising or third-party analytics. CloudFront and API access logging is off. Application logs hold errors only, with no request bodies, email addresses or links, and are kept 1 month.
+- **Not processed:** no cookies, tracking pixels, email open tracking, advertising or third-party analytics. CloudFront and API access logging is off. Application logs hold errors and the security notes above, never request bodies, email addresses, links or internet addresses, and are kept 90 days.
 - **Owner's view:** a named and an anonymous spreadsheet export (answers, status, funnel). The exports never include flight recorder text. They are stored in a private bucket and deleted after 7 days.
 
 ## Processors
