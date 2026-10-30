@@ -25,3 +25,7 @@ export interface Scenario {
 const all: Scenario[] = [incidentFile01 as unknown as Scenario];
 
 export const scenarios: Record<string, Scenario> = Object.fromEntries(all.map((s) => [s.id, s]));
+
+// The file new readers get straight after confirming their email. Change this
+// when a new month's file goes out.
+export const CURRENT_FILE = "incident-file-01";

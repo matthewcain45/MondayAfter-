@@ -180,7 +180,7 @@ export class TmaStack extends cdk.Stack {
     // The check before every send: SES's account status and the bounce and complaint
     // rates. Read-only; these AWS actions can't be limited to one resource.
     const readSendingHealth = new iam.PolicyStatement({ actions: ["ses:GetAccount", "cloudwatch:GetMetricData"], resources: ["*"] });
-    for (const f of [senderFn, followUpFn]) f.addToRolePolicy(readSendingHealth);
+    for (const f of [apiFn, senderFn, followUpFn]) f.addToRolePolicy(readSendingHealth); // the API sends the file after confirming
 
     // ---------- Web address for the code (API) ----------
 

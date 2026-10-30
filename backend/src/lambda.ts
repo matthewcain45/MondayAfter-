@@ -49,6 +49,7 @@ async function build(canDecrypt: boolean, routes: string[]) {
     clock: { now: () => new Date() },
     settings: { siteUrl: await siteUrl(), brand: "The Monday After" },
     audit: consoleAudit,
+    sendingHealth: sesHealth(), // checked before sending the file straight after confirming
   });
   const handle = createRouter(svc, routes, consoleAudit);
   return async (event: HttpEvent) => {
@@ -105,7 +106,7 @@ export const sendFileHandler = async (event: { scenarioId?: string; requestedBy?
   const health = await healthFirst("file");
   if (!health.ok) return { blocked: true, reasons: health.reasons, bounceRate: health.bounceRate, complaintRate: health.complaintRate };
   const result = await (await senderService()).sendFile(scenarioId, { pauseMs: 1100 });
-  consoleAudit("send-finished", { scenarioId, sent: result.sent, failed: result.failed, githubRun: runOf(event) });
+  consoleAudit("send-finished", { scenarioId, sent: result.sent, failed: result.failed, skipped: result.skipped, githubRun: runOf(event) });
   return { ...result, bounceRate: health.bounceRate, complaintRate: health.complaintRate };
 };
 

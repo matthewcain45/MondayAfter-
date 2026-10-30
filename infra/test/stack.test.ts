@@ -115,9 +115,9 @@ describe("data storage", () => {
     assert.ok(!/Recorders/.test(text), "no access to flight recorders");
   });
 
-  it("lets only the sender and follow-up jobs read the sending health", () => {
+  it("lets only the parts that send files read the sending health (API, sender, follow-ups)", () => {
     const withHealth = Object.values(resources).filter((r) => r.Type === "AWS::IAM::Policy" && JSON.stringify(r.Properties).includes("cloudwatch:GetMetricData"));
-    assert.equal(withHealth.length, 2);
+    assert.equal(withHealth.length, 3);
   });
 
   it("shows the sign-up page at the bare web address", () => {

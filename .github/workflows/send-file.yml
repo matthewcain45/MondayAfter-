@@ -57,6 +57,6 @@ jobs:
               process.exit(1);
             }
             if (typeof r.sent !== "number") { console.error("Send failed:", JSON.stringify(r)); process.exit(1); }
-            console.log("## Sent\n\n- Sent: " + r.sent + "\n- Failed: " + r.failed + "\n\n### Sending health, checked before sending\n\n" + rates);
+            console.log("## Sent\n\n- Sent: " + r.sent + "\n- Already had it (skipped): " + (r.skipped || 0) + "\n- Failed: " + r.failed + "\n\n### Sending health, checked before sending\n\n" + rates);
             if (r.failed) console.log("\nA few failures can be addresses AWS refuses to email (for example, ones that bounced before). Ask Claude if there are more than one or two.");
           ' | tee -a "$GITHUB_STEP_SUMMARY"

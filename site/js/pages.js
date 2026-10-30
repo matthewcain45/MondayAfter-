@@ -52,7 +52,10 @@
   if (page === "confirm") {
     const token = takeToken("tma:confirm");
     if (!token) show("confirm-failed");
-    else post("/confirm", token).then(() => show("confirm-done"), (err) => {
+    else post("/confirm", token).then((r) => {
+      if (r.fileSent) $("confirm-done-text").textContent = (r.fileTitle || "Your first incident file") + " is on its way to your inbox. If it hasn't arrived in a few minutes, check your spam folder.";
+      show("confirm-done");
+    }, (err) => {
       $("confirm-failed-text").textContent = err.status === 401 ? "This confirm link has expired or was already used. Sign up again and we'll send a fresh one." : "Couldn't reach us. Check your connection and reload this page.";
       show("confirm-failed");
     });

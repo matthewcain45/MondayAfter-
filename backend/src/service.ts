@@ -6,8 +6,9 @@ import { LIMITS, type Settings } from "./config.ts";
 import { hashForLimit, hashToken, newId, newToken, seal, unseal } from "./crypto.ts";
 import { confirmEmail, fileEmail, followUpEmail, recorderEmail } from "./emails.ts";
 import { labels } from "./export.ts";
-import { scenarios, type Scenario } from "./scenarios.ts";
-import type { Clock, Email, FollowUpAnswer, KeyService, Link, LinkPurpose, Mailer, ReaderState, Store, Subscriber } from "./types.ts";
+import { CURRENT_FILE, scenarios, type Scenario } from "./scenarios.ts";
+import { checkSendingHealth } from "./reputation.ts";
+import type { Clock, Email, FollowUpAnswer, KeyService, Link, LinkPurpose, Mailer, ReaderState, SendingHealthSource, Store, Subscriber } from "./types.ts";
 import { networkForLimits } from "./edge.ts";
 import { emailForLimits, InvalidInput, validateEmail, validateRecorder, validateState } from "./validate.ts";
 
@@ -34,9 +35,12 @@ export interface Deps {
   clock: Clock;
   settings: Settings;
   audit?: Audit;
+  // Checked before the file is sent automatically after confirming. Without one
+  // (local preview), sending is treated as healthy.
+  sendingHealth?: SendingHealthSource;
 }
 
-export function createService({ store, keys, mailer, clock, settings, audit = noAudit }: Deps) {
+export function createService({ store, keys, mailer, clock, settings, audit = noAudit, sendingHealth }: Deps) {
   const nowIso = () => clock.now().toISOString();
   const epoch = (plusSeconds: number) => Math.floor(clock.now().getTime() / 1000) + plusSeconds;
 
@@ -60,6 +64,16 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
   function limited(limit: string, subscriberId: string | undefined, message: string): never {
     audit("rate-limited", { limit, subscriberId });
     throw new ApiError(429, message);
+  }
+
+  // Readers who have already been sent this file.
+  const alreadySent = async (scenarioId: string) =>
+    new Set((await store.listEvents()).filter((e) => e.name === "sent" && e.scenarioId === scenarioId).map((e) => e.subscriberId));
+
+  async function sendFileTo(r: Subscriber, scenario: Scenario & { email?: unknown }) {
+    const token = await issueLink("file", r.id, LIMITS.fileLinkSeconds, scenario.id);
+    await mailer.send(await withOneClick(fileEmail(r.email, scenario.email!, urlFor("index.html", token), await manageUrl(r.id)), r.id));
+    await store.putEvent({ subscriberId: r.id, scenarioId: scenario.id, at: nowIso(), name: "sent", expiresAt: epoch(LIMITS.retentionSeconds) });
   }
 
   async function resolve(token: unknown, purpose: LinkPurpose): Promise<{ link: Link; subscriber: Subscriber }> {
@@ -122,35 +136,55 @@ export function createService({ store, keys, mailer, clock, settings, audit = no
       return { ok: true };
     },
 
-    async confirm(token: unknown): Promise<{ ok: true }> {
+    // Confirms the email, then sends the current file straight away (once, and only
+    // if bounce and complaint rates are healthy). If it can't be sent now, the
+    // reader gets it the next time the owner presses Send Incident File.
+    async confirm(token: unknown): Promise<{ ok: true; fileSent: boolean; fileTitle?: string }> {
       const { link, subscriber } = await resolve(token, "confirm");
-      await store.putSubscriber({ ...subscriber, status: "confirmed", confirmedAt: nowIso(), unsubscribedAt: undefined, expiresAt: epoch(LIMITS.retentionSeconds) });
+      const confirmed: Subscriber = { ...subscriber, status: "confirmed", confirmedAt: nowIso(), unsubscribedAt: undefined, expiresAt: epoch(LIMITS.retentionSeconds) };
+      await store.putSubscriber(confirmed);
       await store.deleteLink(link.tokenHash);
       audit("confirmed", { subscriberId: subscriber.id });
-      return { ok: true };
+      let fileSent = false;
+      let fileTitle: string | undefined;
+      try {
+        const scenario = scenarios[CURRENT_FILE];
+        const healthy = !sendingHealth || (await checkSendingHealth(sendingHealth)).ok;
+        if (scenario?.email && healthy && !(await alreadySent(CURRENT_FILE)).has(subscriber.id)) {
+          await sendFileTo(confirmed, scenario);
+          fileSent = true;
+          fileTitle = scenario.title;
+          audit("file-sent-on-confirm", { subscriberId: subscriber.id, scenarioId: scenario.id });
+        } else if (!healthy) audit("send-blocked", { what: "file on confirm", subscriberId: subscriber.id });
+      } catch {
+        audit("file-on-confirm-failed", { subscriberId: subscriber.id });
+      }
+      return { ok: true, fileSent, fileTitle };
     },
 
     // The "Send Incident File" button: one personal link per confirmed reader.
     // Carries on past individual failures and reports counts only (no addresses).
-    async sendFile(scenarioId: string, options: { pauseMs?: number } = {}): Promise<{ sent: number; failed: number }> {
+    // Readers who already have this file (from an earlier send, or straight after
+    // confirming) are skipped, so pressing the button again is always safe.
+    async sendFile(scenarioId: string, options: { pauseMs?: number } = {}): Promise<{ sent: number; failed: number; skipped: number }> {
       const scenario = scenarios[scenarioId];
       if (!scenario?.email) throw new Error("Unknown scenario, or it has no email: " + scenarioId);
       const now = clock.now().toISOString();
-      const readers = (await store.listSubscribers()).filter((s) => s.status === "confirmed" && !(s.pausedUntil && s.pausedUntil > now));
+      const had = await alreadySent(scenarioId);
+      const confirmed = (await store.listSubscribers()).filter((s) => s.status === "confirmed" && !(s.pausedUntil && s.pausedUntil > now));
+      const readers = confirmed.filter((s) => !had.has(s.id));
       let sent = 0;
       let failed = 0;
       for (const r of readers) {
         try {
-          const token = await issueLink("file", r.id, LIMITS.fileLinkSeconds, scenarioId);
-          await mailer.send(await withOneClick(fileEmail(r.email, scenario.email, urlFor("index.html", token), await manageUrl(r.id)), r.id));
-          await store.putEvent({ subscriberId: r.id, scenarioId, at: nowIso(), name: "sent", expiresAt: epoch(LIMITS.retentionSeconds) });
+          await sendFileTo(r, scenario);
           sent++;
         } catch {
           failed++;
         }
         if (options.pauseMs) await new Promise((res) => setTimeout(res, options.pauseMs));
       }
-      return { sent, failed };
+      return { sent, failed, skipped: confirmed.length - readers.length };
     },
 
     // Runs every morning: emails readers whose 30-day follow-up is due, once each.
