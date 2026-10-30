@@ -32,6 +32,14 @@ export async function confirmedReader(env: ReturnType<typeof setup>, email = FAK
   return { sub, token };
 }
 
+// A confirmed reader who hasn't been sent any file yet (as readers who signed up
+// before files were sent on confirming).
+export async function readerWithoutFile(env: ReturnType<typeof setup>, email = FAKE_EMAIL) {
+  const sub = { id: "sub-" + email.split("@")[0].replace(/\W/g, ""), email, status: "confirmed" as const, createdAt: "2026-10-01T09:00:00.000Z", confirmedAt: "2026-10-01T09:05:00.000Z", expiresAt: 4102444800 };
+  await env.store.putSubscriber(sub);
+  return { sub };
+}
+
 export function designRouteState() {
   return {
     v: 1,

@@ -108,6 +108,7 @@ CODE = [
     ("backend/src/emails.ts", "Did you do it? Tell us with one tap:", "30-day follow-up email (then the link)"),
     ("backend/src/emails.ts", "Your answer is kept with your other answers for this file. This is the only reminder we'll send about it.", "30-day follow-up email"),
     ("site/js/pages.js", "This link has expired or isn't valid. Reply to any Monday After email if you'd like to tell us anyway.", "Follow-up page · expired link"),
+    ("site/js/pages.js", " is on its way to your inbox. If it hasn't arrived in a few minutes, check your spam folder.", "Confirm page · after confirming, when the file is sent (after the file name)"),
     ("site/js/pages.js", "You did it.", "Follow-up page · after answering Yes"),
     ("site/js/pages.js", "You did part of it.", "Follow-up page · after answering Partly"),
     ("site/js/pages.js", "Not yet.", "Follow-up page · after answering Not yet"),

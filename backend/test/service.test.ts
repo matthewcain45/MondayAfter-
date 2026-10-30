@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { ApiError } from "../src/service.ts";
-import { confirmedReader, designRouteState, FAKE_EMAIL, setup, tokenFrom } from "./helpers.ts";
+import { confirmedReader, designRouteState, FAKE_EMAIL, readerWithoutFile, setup, tokenFrom } from "./helpers.ts";
 
 const rejects = (p: Promise<unknown>, status: number) => assert.rejects(p, (e: unknown) => e instanceof ApiError && e.status === status);
 const DAY = 86400;
@@ -246,11 +246,11 @@ describe("unsubscribe and delete", () => {
 describe("sending a file", () => {
   it("emails each confirmed reader their own working link, and nobody else", async () => {
     const env = setup();
-    await confirmedReader(env, "test.user1@example.com");
-    await confirmedReader(env, "test.user2@example.com");
+    await readerWithoutFile(env, "test.user1@example.com");
+    await readerWithoutFile(env, "test.user2@example.com");
     await env.api.signup({ email: "test.pending@example.com", ip: "203.0.113.3" }); // never confirmed
     const before = env.mailer.outbox.length;
-    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 2, failed: 0 });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 2, failed: 0, skipped: 0 });
     const mails = env.mailer.outbox.slice(before);
     assert.deepEqual(mails.map((m) => m.to).sort(), ["test.user1@example.com", "test.user2@example.com"]);
     const links = mails.map((m) => tokenFrom(m.text));
@@ -264,11 +264,11 @@ describe("sending a file", () => {
 
   it("keeps going if one email fails, and reports counts only", async () => {
     const env = setup();
-    await confirmedReader(env, "test.user1@example.com");
-    await confirmedReader(env, "test.user2@example.com");
+    await readerWithoutFile(env, "test.user1@example.com");
+    await readerWithoutFile(env, "test.user2@example.com");
     const send = env.mailer.send;
     env.mailer.send = async (m) => { if (m.to === "test.user1@example.com") throw new Error("not verified"); return send(m); };
-    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 1 });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 1, skipped: 0 });
   });
 
   it("refuses an unknown file", async () => {
@@ -282,25 +282,25 @@ describe("taking a break", () => {
 
   it("pauses the monthly emails for about 3 months, then they restart by themselves", async () => {
     const env = setup();
-    const { sub } = await confirmedReader(env);
+    const { sub } = await readerWithoutFile(env);
     const manage = await manageToken(env, sub.id);
     assert.deepEqual(await env.api.manageStatus(manage), { status: "subscribed" });
     const { pausedUntil } = await env.api.pause(manage);
     assert.equal(pausedUntil.slice(0, 10), "2027-02-01");
     assert.deepEqual(await env.api.manageStatus(manage), { status: "paused", pausedUntil });
-    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 0, failed: 0 });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 0, failed: 0, skipped: 0 });
     env.clock.advance(92 * DAY);
-    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0 });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0, skipped: 0 });
     assert.deepEqual(await env.api.manageStatus(manage), { status: "subscribed" });
   });
 
   it("can be resumed early", async () => {
     const env = setup();
-    const { sub } = await confirmedReader(env);
+    const { sub } = await readerWithoutFile(env);
     const manage = await manageToken(env, sub.id);
     await env.api.pause(manage);
     await env.api.resume(manage);
-    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0 });
+    assert.deepEqual(await env.api.sendFile("incident-file-01"), { sent: 1, failed: 0, skipped: 0 });
   });
 
   it("doesn't reveal the email address, and refuses to pause an unsubscribed reader", async () => {
